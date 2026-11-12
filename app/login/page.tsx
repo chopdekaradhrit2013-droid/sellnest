@@ -89,7 +89,13 @@ function LoginContent() {
           router.push(`/verify-email?email=${encodeURIComponent(resolvedEmail)}`);
           return;
         }
-        setErrorMessage("Invalid credentials. Please verify your username, email, or password.");
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          setErrorMessage(
+            "Invalid email or password. If you haven't created your SellNest store account yet, please create your account on the Sign Up page first!"
+          );
+        } else {
+          setErrorMessage(error.message || "Invalid credentials. Please verify your username, email, or password.");
+        }
         setIsLoading(false);
         return;
       }

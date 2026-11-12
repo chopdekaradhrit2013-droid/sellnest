@@ -474,7 +474,13 @@ declare
   v_fullname text;
 begin
   v_username := lower(coalesce(new.raw_user_meta_data->>'username', ''));
-  v_fullname := coalesce(new.raw_user_meta_data->>'full_name', 'My Store');
+  if v_username = '' or length(v_username) < 3 then
+    v_username := lower(regexp_replace(split_part(new.email, '@', 1), '[^a-z0-9_-]', '', 'g'));
+    if length(v_username) < 3 then
+      v_username := 'user_' || substr(new.id::text, 1, 8);
+    end if;
+  end if;
+  v_fullname := coalesce(new.raw_user_meta_data->>'full_name', v_username, 'My Store');
 
   insert into public.profiles (id, full_name, username, email, avatar_url, is_admin, created_at, updated_at)
   values (
