@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Store, Product } from "@/lib/types";
 import { getStoreBySlug, getStoreProducts } from "@/lib/dashboardService";
+import { getWhatsAppUrl } from "@/lib/utils";
 import StorefrontView from "@/components/storefront/StorefrontView";
 
 function StorefrontContent() {
@@ -137,7 +138,7 @@ function StorefrontContent() {
           {store.whatsapp_number && (
             <div className="pt-2">
               <a
-                href={`https://wa.me/${store.whatsapp_number.replace(/[^0-9]/g, "")}`}
+                href={getWhatsAppUrl(store.whatsapp_number)}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"

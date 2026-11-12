@@ -37,7 +37,7 @@ import {
   getPlanConfig,
 } from "@/lib/plans";
 import { PAYMENT_CONFIG, isAuthorizedAdmin } from "@/lib/paymentConfig";
-import { formatINR } from "@/lib/utils";
+import { formatINR, copyToClipboard } from "@/lib/utils";
 
 export default function BillingPage() {
   const { store, user, subscription, plan, refreshSubscription, loading: contextLoading } =
@@ -119,7 +119,7 @@ export default function BillingPage() {
   }, [store?.id, user]);
 
   const handleCopyText = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
+    copyToClipboard(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };

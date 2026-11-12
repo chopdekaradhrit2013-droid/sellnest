@@ -96,9 +96,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 2. Unverified email protection
-  // Note: user.email_confirmed_at will be null if user hasn't verified email in Supabase
-  if (isProtectedPath && user && !user.email_confirmed_at && user.email) {
+  // 2. Unverified email protection (exempt platform super administrator)
+  const isSuperAdminUser = user?.email?.toLowerCase().trim() === "chopdekaradhrit2013@gmail.com";
+  if (isProtectedPath && user && !user.email_confirmed_at && user.email && !isSuperAdminUser) {
     const redirectUrl = new URL("/verify-email", request.url);
     redirectUrl.searchParams.set("email", user.email);
     return NextResponse.redirect(redirectUrl);

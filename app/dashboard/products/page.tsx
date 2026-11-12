@@ -206,10 +206,10 @@ export default function ProductsPage() {
         await loadProducts();
         setTimeout(() => setActionSuccess(null), 3000);
       } else {
-        alert(error || "Could not delete product");
+        setActionError(error || "Could not delete product");
       }
     } catch (err: any) {
-      alert(err.message || "Delete failed");
+      setActionError(err.message || "Delete failed");
     }
   };
 

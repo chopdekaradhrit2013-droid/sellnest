@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Store, Product } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl, copyToClipboard } from "@/lib/utils";
 import { getStoreBySlug, getProductById, getStoreProducts } from "@/lib/dashboardService";
 import { getThemeConfig, getFontFamilyClass } from "@/lib/themes";
 
@@ -53,6 +53,7 @@ export default function ProductDetailPage() {
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerNotes, setCustomerNotes] = useState("");
   const [orderSent, setOrderSent] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Load existing cart count from localStorage
@@ -182,8 +183,9 @@ export default function ProductDetailPage() {
 
   const handleDirectWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
+    setOrderError(null);
     if (!store.whatsapp_number) {
-      alert("Seller has not configured a WhatsApp number yet.");
+      setOrderError("Seller has not configured a WhatsApp number yet. Please check back later.");
       return;
     }
 
@@ -191,8 +193,7 @@ export default function ProductDetailPage() {
       customerNotes ? `\n• Notes: ${customerNotes}` : ""
     }\n\nPlease confirm availability. Thank you!`;
 
-    const cleanNum = store.whatsapp_number.replace(/[^0-9]/g, "");
-    const waUrl = `https://wa.me/${cleanNum}?text=${encodeURIComponent(message)}`;
+    const waUrl = getWhatsAppUrl(store.whatsapp_number, message);
 
     setOrderSent(true);
     setTimeout(() => {
@@ -209,7 +210,7 @@ export default function ProductDetailPage() {
         url: window.location.href,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      copyToClipboard(window.location.href);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
     }
@@ -554,6 +555,12 @@ export default function ProductDetailPage() {
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {orderError && (
+              <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
+                {orderError}
+              </div>
+            )}
 
             {orderSent ? (
               <div className="py-8 text-center space-y-2">

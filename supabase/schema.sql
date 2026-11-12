@@ -472,14 +472,21 @@ returns trigger as $$
 declare
   v_username text;
   v_fullname text;
+  v_slug text;
 begin
   v_username := lower(coalesce(new.raw_user_meta_data->>'username', ''));
   if v_username = '' or length(v_username) < 3 then
     v_username := lower(regexp_replace(split_part(new.email, '@', 1), '[^a-z0-9_-]', '', 'g'));
     if length(v_username) < 3 then
-      v_username := 'user_' || substr(new.id::text, 1, 8);
+      v_username := 'user_' || substr(replace(new.id::text, '-', ''), 1, 8);
     end if;
   end if;
+
+  -- Ensure username is unique in profiles
+  if exists (select 1 from public.profiles where lower(username) = v_username and id <> new.id) then
+    v_username := substr(v_username, 1, 20) || '_' || substr(replace(new.id::text, '-', ''), 1, 6);
+  end if;
+
   v_fullname := coalesce(new.raw_user_meta_data->>'full_name', v_username, 'My Store');
 
   insert into public.profiles (id, full_name, username, email, avatar_url, is_admin, created_at, updated_at)
@@ -500,12 +507,17 @@ begin
     is_admin = (lower(trim(excluded.email)) = 'chopdekaradhrit2013@gmail.com' or public.profiles.is_admin),
     updated_at = now();
 
-  if v_username <> '' then
+  v_slug := v_username;
+  if exists (select 1 from public.stores where lower(slug) = v_slug and seller_id <> new.id) then
+    v_slug := substr(v_slug, 1, 20) || '-' || substr(replace(new.id::text, '-', ''), 1, 6);
+  end if;
+
+  if v_slug <> '' then
     insert into public.stores (seller_id, name, slug, description, email, whatsapp_number, theme, accent_color, secondary_color, font_family, is_published)
     values (
       new.id,
       v_fullname,
-      v_username,
+      v_slug,
       'Welcome to ' || v_fullname || ' on SellNest. Browse our handcrafted products and order directly.',
       new.email,
       coalesce(new.raw_user_meta_data->>'whatsapp_number', ''),

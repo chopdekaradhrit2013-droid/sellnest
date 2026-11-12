@@ -100,8 +100,9 @@ function LoginContent() {
         return;
       }
 
-      // 3. Check if user email is verified
-      if (data.user && !data.user.email_confirmed_at) {
+      // 3. Check if user email is verified (exempt platform super administrator)
+      const isSuperAdmin = resolvedEmail.toLowerCase().trim() === "chopdekaradhrit2013@gmail.com";
+      if (data.user && !data.user.email_confirmed_at && !isSuperAdmin) {
         router.push(`/verify-email?email=${encodeURIComponent(data.user.email || resolvedEmail)}`);
         return;
       }

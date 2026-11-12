@@ -8,6 +8,11 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") || "/dashboard";
 
+  // Ensure origin respects x-forwarded-host on Vercel and production deployments
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  const baseOrigin = forwardedHost ? `${forwardedProto}://${forwardedHost}` : requestUrl.origin;
+
   if (code) {
     const cookieStore = cookies();
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -47,13 +52,13 @@ export async function GET(request: NextRequest) {
         } catch (e) {
           console.warn("Welcome notification warning:", e);
         }
-        return NextResponse.redirect(new URL(next, request.url));
+        return NextResponse.redirect(new URL(next, baseOrigin));
       }
     }
   }
 
   // Return the user to an error page or back to login with error state
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = new URL("/login", baseOrigin);
   loginUrl.searchParams.set("error", "Verification link has expired or is invalid. Please try again.");
   return NextResponse.redirect(loginUrl);
 }

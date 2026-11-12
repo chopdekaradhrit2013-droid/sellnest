@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useDashboard } from "@/lib/DashboardContext";
 import { updateStore } from "@/lib/dashboardService";
+import { copyToClipboard } from "@/lib/utils";
 
 export default function MyStorePage() {
   const { store, user, refreshStore, loading: storeLoading } = useDashboard();
@@ -56,7 +57,7 @@ export default function MyStorePage() {
 
   const handleCopyLink = () => {
     const fullUrl = typeof window !== "undefined" ? `${window.location.origin}/store/${slug}` : `https://sellnest.com/store/${slug}`;
-    navigator.clipboard?.writeText(fullUrl);
+    copyToClipboard(fullUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

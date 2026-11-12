@@ -30,7 +30,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { Store, Product } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 import { getThemeConfig, getFontFamilyClass } from "@/lib/themes";
 
 interface StorefrontViewProps {
@@ -271,7 +271,7 @@ export default function StorefrontView({
                 href={
                   isPreview
                     ? "#"
-                    : `https://wa.me/${(store.whatsapp_number || "").replace(/[^0-9]/g, "")}`
+                    : getWhatsAppUrl(store.whatsapp_number)
                 }
                 target={isPreview ? "_self" : "_blank"}
                 rel="noreferrer"
@@ -778,7 +778,7 @@ export default function StorefrontView({
             <div className="pt-2 flex flex-col sm:flex-row gap-2">
               {store.whatsapp_number && (
                 <a
-                  href={`https://wa.me/${(store.whatsapp_number || "").replace(/[^0-9]/g, "")}`}
+                  href={getWhatsAppUrl(store.whatsapp_number)}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs"

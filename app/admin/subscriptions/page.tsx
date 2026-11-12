@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { SubscriptionUpgradeRequest } from "@/lib/plans";
 import { PAYMENT_CONFIG } from "@/lib/paymentConfig";
-import { formatINR } from "@/lib/utils";
+import { formatINR, copyToClipboard } from "@/lib/utils";
 
 export default function AdminSubscriptionsPage() {
   const [requests, setRequests] = useState<SubscriptionUpgradeRequest[]>([]);
@@ -78,7 +78,7 @@ export default function AdminSubscriptionsPage() {
   }, []);
 
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
+    copyToClipboard(text);
     setCopiedRef(text);
     setTimeout(() => setCopiedRef(null), 2000);
   };

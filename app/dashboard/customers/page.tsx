@@ -16,7 +16,7 @@ import {
 import { useDashboard } from "@/lib/DashboardContext";
 import { getStoreCustomers } from "@/lib/dashboardService";
 import { Customer } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 
 export default function CustomersPage() {
   const { store, loading: storeLoading } = useDashboard();
@@ -177,7 +177,7 @@ export default function CustomersPage() {
                               <span>{cust.phone}</span>
                               {cleanPhone && (
                                 <a
-                                  href={`https://wa.me/${cleanPhone}`}
+                                  href={getWhatsAppUrl(cust.phone)}
                                   target="_blank"
                                   rel="noreferrer"
                                   className="text-emerald-600 hover:text-emerald-700 font-semibold inline-flex items-center gap-1 text-[11px] ml-1"

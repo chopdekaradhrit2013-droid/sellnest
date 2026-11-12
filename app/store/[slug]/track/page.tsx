@@ -20,7 +20,7 @@ import {
   Store as StoreIcon,
 } from "lucide-react";
 import { Order, Store, OrderStatus } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 import { getStoreBySlug } from "@/lib/dashboardService";
 
 const STATUS_STEPS: Array<{ id: OrderStatus; label: string; desc: string }> = [
@@ -355,17 +355,10 @@ function OrderTrackingContent() {
             {(trackedOrder.store?.whatsapp_number || store?.whatsapp_number) && (
               <div className="border-t border-zinc-100 pt-4">
                 <a
-                  href={`https://wa.me/${(
-                    trackedOrder.store?.whatsapp_number ||
-                    store?.whatsapp_number ||
-                    ""
-                  ).replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-                    `Hello ${
-                      trackedOrder.store?.name || store?.name || "Seller"
-                    }! I am inquiring about my order ${
-                      trackedOrder.order_code || trackedOrder.order_number
-                    }.`
-                  )}`}
+                  href={getWhatsAppUrl(
+                    trackedOrder.store?.whatsapp_number || store?.whatsapp_number,
+                    `Hello ${trackedOrder.store?.name || store?.name || "Seller"}! I am inquiring about my order ${trackedOrder.order_code || trackedOrder.order_number}.`
+                  )}
                   target="_blank"
                   rel="noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs"

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { copyToClipboard } from "@/lib/utils";
 import {
   Sparkles,
   ArrowRight,
@@ -22,7 +23,7 @@ export function HowItWorksSection({ onOpenCreateStore }: HowItWorksSectionProps)
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText("sellnest.store/thebutterroom");
+    copyToClipboard("sellnest.store/thebutterroom");
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };

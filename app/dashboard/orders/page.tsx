@@ -24,7 +24,7 @@ import {
 import { useDashboard } from "@/lib/DashboardContext";
 import { getStoreOrders, updateOrderStatus, createOrder } from "@/lib/dashboardService";
 import { Order, OrderStatus } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 
 export default function OrdersPage() {
   const { store, loading: storeLoading } = useDashboard();
@@ -339,9 +339,10 @@ export default function OrdersPage() {
                         <span className="font-mono">{ord.customer_phone}</span>
                         {cleanPhone && (
                           <a
-                            href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                            href={getWhatsAppUrl(
+                              ord.customer_phone,
                               `Hello ${ord.customer_name}! Regarding your order ${displayCode} from ${store?.name}...`
-                            )}`}
+                            )}
                             target="_blank"
                             rel="noreferrer"
                             className="text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-0.5 ml-1"
@@ -530,9 +531,10 @@ export default function OrdersPage() {
             {/* Direct WhatsApp Contact Button */}
             {selectedOrder.customer_phone && (
               <a
-                href={`https://wa.me/${selectedOrder.customer_phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+                href={getWhatsAppUrl(
+                  selectedOrder.customer_phone,
                   `Hello ${selectedOrder.customer_name}! Your order ${selectedOrder.order_code || selectedOrder.order_number} is now ${selectedOrder.status}.`
-                )}`}
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs"

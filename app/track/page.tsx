@@ -20,7 +20,7 @@ import {
   Store as StoreIcon,
 } from "lucide-react";
 import { Order, OrderStatus } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 
 const STATUS_STEPS: Array<{ id: OrderStatus; label: string; desc: string }> = [
   { id: "pending", label: "Order Received", desc: "Awaiting confirmation from maker" },
@@ -258,7 +258,7 @@ function GlobalTrackContent() {
             {/* Contact Seller */}
             {trackedOrder.store?.whatsapp_number && (
               <a
-                href={`https://wa.me/${trackedOrder.store.whatsapp_number.replace(/[^0-9]/g, "")}`}
+                href={getWhatsAppUrl(trackedOrder.store.whatsapp_number)}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs"

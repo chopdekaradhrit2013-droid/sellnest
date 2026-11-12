@@ -19,7 +19,7 @@ import {
   Check,
 } from "lucide-react";
 import { Order, Store } from "@/lib/types";
-import { formatINR } from "@/lib/utils";
+import { formatINR, getWhatsAppUrl, copyToClipboard } from "@/lib/utils";
 import { getOrderById, getStoreBySlug } from "@/lib/dashboardService";
 import { getThemeConfig, getFontFamilyClass } from "@/lib/themes";
 
@@ -57,7 +57,7 @@ export default function OrderConfirmationPage() {
   const orderCode = order?.order_code || (order?.order_number ? `SN-${order.order_number}` : orderId);
 
   const handleCopyCode = () => {
-    navigator.clipboard?.writeText(orderCode);
+    copyToClipboard(orderCode);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
@@ -125,10 +125,7 @@ ${itemsText}
 
 Please confirm my order and share payment instructions. Thank you!`;
 
-  const cleanPhone = (store.whatsapp_number || "").replace(/[^0-9]/g, "");
-  const waUrl = cleanPhone
-    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`
-    : "#";
+  const waUrl = getWhatsAppUrl(store.whatsapp_number, waMessage);
 
   return (
     <div className={`min-h-screen ${theme.styles.bodyBg} ${fontClass} text-zinc-900 py-10 px-4 sm:px-6`}>
