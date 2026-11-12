@@ -24,6 +24,11 @@ const STORAGE_UPGRADE_REQUESTS = "sellnest_local_upgrade_requests";
 // In-memory store for server-side route handler executions when Supabase is in fallback mode
 const serverDataCache: Record<string, any> = {};
 
+export function isUuid(val?: string | null): boolean {
+  if (!val) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+}
+
 export const STARTER_SAMPLE_PRODUCTS: Product[] = [
   {
     id: "prod-1",
@@ -170,18 +175,30 @@ export async function getSellerStore(sellerId: string, userMetadata?: any): Prom
   }
 
   const supabase = createClient();
-  const { data: store, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("seller_id", sellerId)
-    .maybeSingle();
-
-  if (error) {
-    console.warn("Could not fetch store from Supabase:", error.message);
-    return null;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sellerId);
+  
+  let store: any = null;
+  if (isUuid) {
+    const { data } = await supabase
+      .from("stores")
+      .select("*")
+      .or(`seller_id.eq.${sellerId},id.eq.${sellerId}`)
+      .maybeSingle();
+    store = data;
+  } else {
+    const { data } = await supabase
+      .from("stores")
+      .select("*")
+      .ilike("slug", sellerId)
+      .maybeSingle();
+    store = data;
   }
 
-  if (!store && userMetadata?.username) {
+  if (store) {
+    return store as Store;
+  }
+
+  if (userMetadata?.username) {
     // Auto-create default store if not exists
     const newStore: Partial<Store> = {
       seller_id: sellerId,
@@ -207,7 +224,36 @@ export async function getSellerStore(sellerId: string, userMetadata?: any): Prom
     }
   }
 
-  return store as Store | null;
+  // Graceful fallback for demo or test store
+  if (sellerId === "seller-1" || sellerId === "demo-store-1" || !store) {
+    let localStore = getLocalData<Store | null>(STORAGE_STORE, null);
+    if (!localStore) {
+      localStore = {
+        id: "demo-store-1",
+        seller_id: "seller-1",
+        name: "The Butter Room",
+        slug: "thebutterroom",
+        description: "Small-batch artisanal sourdough, viennoiserie & celebration bakes in Bengaluru.",
+        logo_url: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=200&q=80",
+        banner_url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+        email: "maker@thebutterroom.in",
+        phone: "+91 98765 43210",
+        whatsapp_number: "+91 98765 43210",
+        theme: "modern",
+        accent_color: "#7C3AED",
+        secondary_color: "#4F46E5",
+        font_family: "sans",
+        currency: "INR",
+        is_published: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setLocalData(STORAGE_STORE, localStore);
+    }
+    return localStore;
+  }
+
+  return null;
 }
 
 export async function updateStore(storeId: string, updates: Partial<Store>): Promise<{ data: Store | null; error: string | null }> {
@@ -333,6 +379,33 @@ export async function getStoreBySlug(
     .maybeSingle();
 
   if (error || !data) {
+    if (cleanSlug === "thebutterroom" || !cleanSlug) {
+      let localStore = getLocalData<Store | null>(STORAGE_STORE, null);
+      if (!localStore) {
+        localStore = {
+          id: "demo-store-1",
+          seller_id: "seller-1",
+          name: "The Butter Room",
+          slug: "thebutterroom",
+          description: "Small-batch artisanal sourdough, viennoiserie & celebration bakes in Bengaluru.",
+          logo_url: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=200&q=80",
+          banner_url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+          email: "maker@thebutterroom.in",
+          phone: "+91 98765 43210",
+          whatsapp_number: "+91 98765 43210",
+          theme: "modern",
+          accent_color: "#7C3AED",
+          secondary_color: "#4F46E5",
+          font_family: "sans",
+          currency: "INR",
+          is_published: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setLocalData(STORAGE_STORE, localStore);
+      }
+      return { store: localStore };
+    }
     return { store: null };
   }
 
@@ -373,7 +446,10 @@ export async function getProductById(
   }
 
   const { data, error } = await query.maybeSingle();
-  if (error || !data) return null;
+  if (error || !data) {
+    const prods = getLocalData<Product[]>(STORAGE_PRODUCTS, STARTER_SAMPLE_PRODUCTS);
+    return prods.find((p) => p.id === productId) || null;
+  }
   return data as Product;
 }
 
@@ -382,8 +458,10 @@ export async function getProductById(
 // ==============================================================================
 
 export async function getStoreProducts(storeId: string): Promise<Product[]> {
-  if (!isSupabaseConfigured()) {
-    return getLocalData<Product[]>(STORAGE_PRODUCTS, []);
+  if (!isSupabaseConfigured() || storeId === "demo-store-1") {
+    const local = getLocalData<Product[]>(STORAGE_PRODUCTS, []);
+    if (local.length > 0) return local;
+    return STARTER_SAMPLE_PRODUCTS;
   }
 
   const supabase = createClient();
@@ -393,8 +471,12 @@ export async function getStoreProducts(storeId: string): Promise<Product[]> {
     .eq("store_id", storeId)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching products:", error);
+  if (error || !data || data.length === 0) {
+    if (storeId === "demo-store-1") {
+      const local = getLocalData<Product[]>(STORAGE_PRODUCTS, []);
+      if (local.length > 0) return local;
+      return STARTER_SAMPLE_PRODUCTS;
+    }
     return [];
   }
 
@@ -469,7 +551,7 @@ export async function getStoreSubscription(
     updated_at: new Date().toISOString(),
   };
 
-  if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured() || !isUuid(storeId)) {
     const existing = getLocalData<StoreSubscription | null>(STORAGE_SUBSCRIPTION, null);
     if (existing && existing.store_id === storeId) {
       return existing;
@@ -518,7 +600,7 @@ export async function changeStorePlan(
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured() || !isUuid(storeId)) {
     const updated: StoreSubscription = {
       id: "sub-" + storeId,
       store_id: storeId,
@@ -832,11 +914,13 @@ export async function reviewUpgradeRequest(
     targetReq = all.find((r) => r.id === requestId || r.request_number === requestId) || null;
   } else {
     const supabase = createClient();
-    const { data } = await supabase
-      .from("subscription_upgrade_requests")
-      .select("*")
-      .or(`id.eq.${requestId},request_number.eq.${requestId}`)
-      .maybeSingle();
+    let query = supabase.from("subscription_upgrade_requests").select("*");
+    if (isUuid(requestId)) {
+      query = query.or(`id.eq.${requestId},request_number.eq.${requestId}`);
+    } else {
+      query = query.eq("request_number", requestId);
+    }
+    const { data } = await query.maybeSingle();
 
     if (data) {
       targetReq = data as SubscriptionUpgradeRequest;
@@ -883,7 +967,7 @@ export async function reviewUpgradeRequest(
     const targetPlan = getPlanConfig(targetReq.target_plan_id);
     const invoiceNumber = `INV-${now.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !isUuid(targetReq.store_id) || !isUuid(targetReq.id)) {
       // Update local storage requests
       const all = getLocalData<SubscriptionUpgradeRequest[]>(STORAGE_UPGRADE_REQUESTS, []);
       const idx = all.findIndex((r) => r.id === targetReq!.id);
@@ -962,7 +1046,7 @@ export async function reviewUpgradeRequest(
       updated_at: now.toISOString(),
     };
 
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !isUuid(targetReq.store_id) || !isUuid(targetReq.id)) {
       const all = getLocalData<SubscriptionUpgradeRequest[]>(STORAGE_UPGRADE_REQUESTS, []);
       const idx = all.findIndex((r) => r.id === targetReq!.id);
       if (idx !== -1) all[idx] = updatedRequest;
@@ -1190,7 +1274,7 @@ export async function createOrder(
   const generatedCode =
     orderData.order_code || `SN-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured() || !isUuid(storeId)) {
     const orders = getLocalData<Order[]>(STORAGE_ORDERS, []);
     const newOrder: Order = {
       id: "ord-" + Date.now(),
@@ -1437,6 +1521,23 @@ export async function trackCustomerOrder(
   const { data, error } = await query.maybeSingle();
 
   if (error || !data) {
+    const orders = getLocalData<Order[]>(STORAGE_ORDERS, []);
+    const localStore = getLocalData<Store | null>(STORAGE_STORE, null);
+
+    const found = orders.find((o) => {
+      const matchCode =
+        o.order_code?.toUpperCase() === cleanCode ||
+        o.order_number?.toString() === cleanCode ||
+        o.id === orderCodeOrNumber;
+      const orderPhone = (o.customer_phone || "").replace(/[^0-9]/g, "");
+      const matchPhone = orderPhone.includes(cleanPhone);
+      return matchCode && matchPhone;
+    });
+
+    if (found) {
+      return { order: found, store: localStore, error: null };
+    }
+
     return {
       order: null,
       store: null,

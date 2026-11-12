@@ -219,13 +219,13 @@ async function main() {
     record("D1b. Unauthorized email rejected from admin authentication", res.status === 403);
   });
 
-  await runTest("D2. chopdekaradhrit2013@gmail.com signs in with password/credentials", async () => {
+  await runTest("D2. chopdekaradhrit2013@gmail.com signs in with credentials / security passkey", async () => {
     const res = await fetch(`${BASE_URL}/api/admin/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: ADMIN_EMAIL,
-        password: "securepassword123",
+        passkey: process.env.ADMIN_SECRET_KEY || "sellnest_admin_secure_key_2026",
       }),
     });
 
@@ -233,9 +233,9 @@ async function main() {
     const setCookie = res.headers.get("set-cookie");
     if (res.ok && data.success && setCookie) {
       cookieJar = setCookie.split(";")[0];
-      record("D2. chopdekaradhrit2013@gmail.com authenticated with password & session cookie issued", true);
+      record("D2. chopdekaradhrit2013@gmail.com authenticated & session cookie issued", true);
     } else {
-      record("D2. chopdekaradhrit2013@gmail.com authenticated with password & session cookie issued", false, data.error || "No cookie");
+      record("D2. chopdekaradhrit2013@gmail.com authenticated & session cookie issued", false, data.error || "No cookie");
     }
   });
 

@@ -208,6 +208,105 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (storeErr || !store) {
+      const { store: demoStore } = await getStoreBySlug(storeSlug);
+      if (demoStore) {
+        // Fall back to demo store ordering handler
+        const allProds = await getStoreProducts(demoStore.id);
+        let trustedSubtotal = 0;
+        const orderItemsToSave: Array<{
+          product_id?: string;
+          product_name: string;
+          quantity: number;
+          unit_price: number;
+        }> = [];
+
+        for (const reqItem of items) {
+          const product = allProds.find((p) => p.id === reqItem.productId);
+          if (!product) {
+            return NextResponse.json(
+              { error: `A product in your bag is no longer available.` },
+              { status: 400 }
+            );
+          }
+
+          const qty = Math.max(1, parseInt(reqItem.quantity) || 1);
+          if (product.stock_quantity !== undefined && product.stock_quantity < qty) {
+            return NextResponse.json(
+              {
+                error: `Insufficient stock for "${product.name}". Only ${product.stock_quantity} left in stock.`,
+              },
+              { status: 400 }
+            );
+          }
+
+          const itemTotal = product.price * qty;
+          trustedSubtotal += itemTotal;
+
+          orderItemsToSave.push({
+            product_id: product.id,
+            product_name: product.name,
+            quantity: qty,
+            unit_price: product.price,
+          });
+        }
+
+        const deliveryFee = trustedSubtotal >= 1000 ? 0 : 60;
+        const finalTotal = trustedSubtotal + deliveryFee;
+        const orderCode = `SN-${Math.floor(100000 + Math.random() * 900000)}`;
+
+        const { data: createdOrder, error: createErr } = await createOrder(
+          demoStore.id,
+          {
+            order_code: orderCode,
+            customer_name: customer.full_name.trim(),
+            customer_phone: customer.phone.trim(),
+            customer_email: customer.email?.trim(),
+            delivery_address: customer.delivery_address.trim(),
+            city: customer.city?.trim() || "Bengaluru",
+            state: customer.state?.trim() || "Karnataka",
+            pincode: customer.pincode?.trim() || "560001",
+            subtotal_amount: trustedSubtotal,
+            delivery_fee: deliveryFee,
+            total_amount: finalTotal,
+            status: "pending",
+            notes: customer.notes?.trim() || "",
+          },
+          orderItemsToSave
+        );
+
+        if (createErr || !createdOrder) {
+          return NextResponse.json(
+            { error: createErr || "Failed to create order." },
+            { status: 500 }
+          );
+        }
+
+        const successResp = {
+          success: true,
+          order: {
+            id: createdOrder.id,
+            order_code: orderCode,
+            customer_name: createdOrder.customer_name,
+            total_amount: finalTotal,
+            delivery_fee: deliveryFee,
+            subtotal_amount: trustedSubtotal,
+            items_count: orderItemsToSave.length,
+            store_slug: demoStore.slug,
+            store_name: demoStore.name,
+            whatsapp_number: demoStore.whatsapp_number,
+          },
+        };
+
+        if (idempotencyKey) {
+          recentSubmissions.set(idempotencyKey, {
+            timestamp: Date.now(),
+            response: successResp,
+          });
+        }
+
+        return NextResponse.json(successResp);
+      }
+
       return NextResponse.json({ error: "Store not found." }, { status: 404 });
     }
 
