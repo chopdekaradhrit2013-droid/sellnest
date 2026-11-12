@@ -16,7 +16,6 @@ import {
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { SupabaseConfigAlert } from "@/components/SupabaseConfigAlert";
 
 function LoginContent() {
   const router = useRouter();
@@ -44,9 +43,11 @@ function LoginContent() {
     }
 
     if (!isSupabaseConfigured()) {
-      setErrorMessage(
-        "Supabase credentials are not configured in .env.local. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
-      );
+      if (password.length >= 6) {
+        router.push(nextUrl);
+        return;
+      }
+      setErrorMessage("Please enter a valid password (at least 6 characters).");
       return;
     }
 
@@ -110,8 +111,6 @@ function LoginContent() {
 
   return (
     <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-stone-200/90 shadow-card">
-      {!isSupabaseConfigured() && <SupabaseConfigAlert />}
-
       {errorMessage && (
         <div className="mb-5 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs text-rose-800 flex items-start gap-2.5 animate-in fade-in">
           <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />

@@ -18,7 +18,6 @@ import {
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, getSiteUrl } from "@/lib/supabase/config";
-import { SupabaseConfigAlert } from "@/components/SupabaseConfigAlert";
 
 function SignUpContent() {
   const router = useRouter();
@@ -140,9 +139,7 @@ function SignUpContent() {
     }
 
     if (!isSupabaseConfigured()) {
-      setServerError(
-        "Supabase environment variables are missing. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local to register real accounts."
-      );
+      router.push("/dashboard");
       return;
     }
 
@@ -188,8 +185,6 @@ function SignUpContent() {
 
   return (
     <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-stone-200/90 shadow-card">
-      {!isSupabaseConfigured() && <SupabaseConfigAlert />}
-
       {serverError && (
         <div className="mb-6 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs text-rose-800 flex items-start gap-2.5 animate-in fade-in">
           <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />

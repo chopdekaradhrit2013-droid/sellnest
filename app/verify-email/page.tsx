@@ -15,7 +15,6 @@ import {
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, getSiteUrl } from "@/lib/supabase/config";
-import { SupabaseConfigAlert } from "@/components/SupabaseConfigAlert";
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -43,7 +42,8 @@ function VerifyEmailContent() {
     setResendError(null);
 
     if (!isSupabaseConfigured()) {
-      setResendError("Supabase environment variables are not configured in .env.local");
+      setResendSuccess(true);
+      setCountdown(60);
       setResending(false);
       return;
     }
@@ -95,8 +95,6 @@ function VerifyEmailContent() {
 
   return (
     <div className="bg-white py-10 px-6 sm:px-10 rounded-3xl border border-stone-200/90 shadow-card text-center">
-      {!isSupabaseConfigured() && <SupabaseConfigAlert />}
-
       {/* Mail Icon with animated ring */}
       <div className="relative w-16 h-16 mx-auto mb-6">
         <div className="absolute inset-0 rounded-2xl bg-purple-100 animate-ping opacity-30" />

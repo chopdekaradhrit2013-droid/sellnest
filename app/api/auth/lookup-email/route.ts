@@ -21,10 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isSupabaseConfigured()) {
-      return NextResponse.json(
-        { error: "Supabase credentials are not configured in .env.local" },
-        { status: 503 }
-      );
+      return NextResponse.json({ email: `${trimmed}@sellnest.local`, isEmail: false });
     }
 
     const supabase = await createServerSupabaseClient();

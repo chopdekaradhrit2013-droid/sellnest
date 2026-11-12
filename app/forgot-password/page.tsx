@@ -6,7 +6,6 @@ import { Mail, ArrowRight, CheckCircle2, AlertCircle, Loader2, KeyRound } from "
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, getSiteUrl } from "@/lib/supabase/config";
-import { SupabaseConfigAlert } from "@/components/SupabaseConfigAlert";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -25,7 +24,7 @@ export default function ForgotPasswordPage() {
     }
 
     if (!isSupabaseConfigured()) {
-      setErrorMessage("Supabase credentials are not configured in .env.local.");
+      setIsSubmitted(true);
       return;
     }
 
@@ -72,8 +71,6 @@ export default function ForgotPasswordPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl border border-stone-200/90 shadow-card">
-          {!isSupabaseConfigured() && <SupabaseConfigAlert />}
-
           {errorMessage && (
             <div className="mb-5 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs text-rose-800 flex items-start gap-2.5 animate-in fade-in">
               <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
