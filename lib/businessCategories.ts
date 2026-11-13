@@ -81,3 +81,4 @@ export function getResolvedCategory(selectedId: string, customText?: string): st
   const match = BUSINESS_CATEGORIES.find((c) => c.id === selectedId);
   return match ? match.name : selectedId || "General";
 }
+
