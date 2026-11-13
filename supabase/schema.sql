@@ -539,6 +539,23 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Auto-confirm all users immediately on signup (bypasses manual email confirmation)
+create or replace function public.auto_confirm_user()
+returns trigger as $$
+begin
+  new.email_confirmed_at := coalesce(new.email_confirmed_at, now());
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_auto_confirm on auth.users;
+create trigger on_auth_user_auto_confirm
+  before insert on auth.users
+  for each row execute procedure public.auto_confirm_user();
+
+-- Confirm all existing unconfirmed accounts
+update auth.users set email_confirmed_at = now() where email_confirmed_at is null;
+
 -- Ensure platform administrator chopdekaradhrit2013@gmail.com always has is_admin privileges
 update public.profiles set is_admin = true where lower(trim(email)) = 'chopdekaradhrit2013@gmail.com';
 
