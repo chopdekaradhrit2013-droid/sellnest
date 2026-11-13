@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Sparkles, CheckCircle2, ArrowRight, Store, MessageCircle, ShoppingBag } from "lucide-react";
+import { X, Sparkles, CheckCircle2, ArrowRight, Store, MessageCircle, ShoppingBag, HelpCircle } from "lucide-react";
 import { Logo } from "./Logo";
+import { BUSINESS_CATEGORIES, getResolvedCategory } from "@/lib/businessCategories";
 
 interface CreateStoreModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export function CreateStoreModal({ isOpen, onClose, initialHandle = "" }: Create
   const [handle, setHandle] = useState(initialHandle);
   const [businessName, setBusinessName] = useState("");
   const [category, setCategory] = useState("bakery");
+  const [customCategory, setCustomCategory] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -29,7 +31,8 @@ export function CreateStoreModal({ isOpen, onClose, initialHandle = "" }: Create
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!handle) return;
-    window.location.href = `/signup?handle=${encodeURIComponent(handle)}&name=${encodeURIComponent(businessName)}`;
+    const resolved = getResolvedCategory(category, customCategory);
+    window.location.href = `/signup?handle=${encodeURIComponent(handle)}&name=${encodeURIComponent(businessName)}&category=${encodeURIComponent(resolved)}&whatsapp=${encodeURIComponent(whatsapp)}`;
   };
 
   const handleReset = () => {
@@ -118,23 +121,36 @@ export function CreateStoreModal({ isOpen, onClose, initialHandle = "" }: Create
                   />
                 </div>
 
-                {/* Category Selection */}
+                {/* Business Category Selection */}
                 <div>
                   <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
-                    What are you selling?
+                    What is your business about?
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full rounded-xl border border-stone-300 px-3.5 py-2.5 text-sm text-charcoal-900 bg-stone-50/50 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all cursor-pointer"
                   >
-                    <option value="bakery">🧁 Home Bakery & Confectionery</option>
-                    <option value="fashion">👗 Instagram Clothing & Apparel</option>
-                    <option value="jewellery">✨ Handmade Jewellery & Silver</option>
-                    <option value="pottery">🏺 Studio Pottery, Ceramics & Decor</option>
-                    <option value="candles">🕯️ Artisan Candles & Fragrances</option>
-                    <option value="other">🌿 Other Handcrafted & Indie Goods</option>
+                    {BUSINESS_CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon} {cat.name}
+                      </option>
+                    ))}
                   </select>
+
+                  {/* 11th Option: Other (custom input) */}
+                  {category === "other" && (
+                    <div className="mt-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <input
+                        type="text"
+                        required
+                        placeholder="Type what your business is about (e.g. Resin Art, Vintage Watches)..."
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        className="w-full rounded-xl border border-purple-300 px-3.5 py-2 text-xs text-charcoal-900 placeholder:text-charcoal-400 bg-purple-50/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* WhatsApp Number */}

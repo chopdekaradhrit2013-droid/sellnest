@@ -32,6 +32,7 @@ create table if not exists public.stores (
   name text not null,
   slug text not null,
   description text,
+  business_category text default 'General',
   logo_url text,
   banner_url text,
   email text,
@@ -473,6 +474,7 @@ declare
   v_username text;
   v_fullname text;
   v_slug text;
+  v_category text;
 begin
   v_username := lower(coalesce(new.raw_user_meta_data->>'username', ''));
   if v_username = '' or length(v_username) < 3 then
@@ -488,6 +490,7 @@ begin
   end if;
 
   v_fullname := coalesce(new.raw_user_meta_data->>'full_name', v_username, 'My Store');
+  v_category := coalesce(new.raw_user_meta_data->>'business_category', 'Handcrafted & Artisanal Goods');
 
   insert into public.profiles (id, full_name, username, email, avatar_url, is_admin, created_at, updated_at)
   values (
@@ -513,12 +516,13 @@ begin
   end if;
 
   if v_slug <> '' then
-    insert into public.stores (seller_id, name, slug, description, email, whatsapp_number, theme, accent_color, secondary_color, font_family, is_published)
+    insert into public.stores (seller_id, name, slug, description, business_category, email, whatsapp_number, theme, accent_color, secondary_color, font_family, is_published)
     values (
       new.id,
       v_fullname,
       v_slug,
-      'Welcome to ' || v_fullname || ' on SellNest. Browse our handcrafted products and order directly.',
+      'Welcome to ' || v_fullname || ' on SellNest. Browse our ' || lower(v_category) || ' and order directly via WhatsApp.',
+      v_category,
       new.email,
       coalesce(new.raw_user_meta_data->>'whatsapp_number', ''),
       'modern',

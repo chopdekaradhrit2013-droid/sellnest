@@ -18,6 +18,7 @@ import {
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured, getSiteUrl } from "@/lib/supabase/config";
+import { BUSINESS_CATEGORIES, getResolvedCategory } from "@/lib/businessCategories";
 
 function SignUpContent() {
   const router = useRouter();
@@ -26,6 +27,8 @@ function SignUpContent() {
   // Form fields
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [category, setCategory] = useState("bakery");
+  const [customCategory, setCustomCategory] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -46,12 +49,24 @@ function SignUpContent() {
   useEffect(() => {
     const handleParam = searchParams.get("handle");
     const nameParam = searchParams.get("name");
+    const categoryParam = searchParams.get("category");
     if (handleParam) {
       const clean = handleParam.toLowerCase().replace(/[^a-z0-9_-]/g, "");
       setUsername(clean);
     }
     if (nameParam) {
       setFullName(nameParam);
+    }
+    if (categoryParam) {
+      const match = BUSINESS_CATEGORIES.find(
+        (c) => c.id === categoryParam || c.name.toLowerCase() === categoryParam.toLowerCase()
+      );
+      if (match) {
+        setCategory(match.id);
+      } else {
+        setCategory("other");
+        setCustomCategory(categoryParam);
+      }
     }
   }, [searchParams]);
 
@@ -150,6 +165,7 @@ function SignUpContent() {
       const cleanUsername = username.trim().toLowerCase();
       const cleanEmail = email.trim().toLowerCase();
       const siteUrl = getSiteUrl();
+      const resolvedCategory = getResolvedCategory(category, customCategory);
 
       // Sign up through Supabase Auth
       const { data, error } = await supabase.auth.signUp({
@@ -160,6 +176,7 @@ function SignUpContent() {
           data: {
             full_name: fullName.trim(),
             username: cleanUsername,
+            business_category: resolvedCategory,
           },
         },
       });
@@ -275,6 +292,44 @@ function SignUpContent() {
             <p className="mt-1 text-[10px] text-charcoal-500">
               Your store's permanent address. Use letters, numbers, hyphens, and underscores.
             </p>
+          )}
+        </div>
+
+        {/* Business Category Selection */}
+        <div>
+          <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+            <span>What is your business about?</span>
+            <span className="text-[11px] font-normal text-purple-700">Choose your craft</span>
+          </label>
+          <div className="relative">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full rounded-xl border border-stone-300 px-3.5 py-2.5 text-sm text-charcoal-900 bg-stone-50/50 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all cursor-pointer font-medium"
+            >
+              {BUSINESS_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 11th Option: Custom "Other" Input */}
+          {category === "other" && (
+            <div className="mt-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+              <label className="block text-[11px] font-medium text-charcoal-600 mb-1">
+                Tell us about your business:
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Resin Art, Organic Pet Treats, Vintage Watches, Terrariums..."
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                className="w-full rounded-xl border border-purple-300 px-3.5 py-2.5 text-sm font-medium text-charcoal-900 placeholder:text-stone-400 bg-purple-50/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all"
+              />
+            </div>
           )}
         </div>
 

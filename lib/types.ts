@@ -20,6 +20,7 @@ export interface StoreSocialLinks {
 export interface StoreCustomization {
   name: string;
   description?: string;
+  business_category?: string;
   theme: StoreTheme;
   accent_color: string;
   secondary_color?: string;
@@ -40,6 +41,7 @@ export interface Store {
   name: string;
   slug: string;
   description?: string;
+  business_category?: string;
   logo_url?: string;
   banner_url?: string;
   email?: string;

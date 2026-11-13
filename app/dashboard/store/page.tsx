@@ -21,6 +21,7 @@ import {
 import { useDashboard } from "@/lib/DashboardContext";
 import { updateStore } from "@/lib/dashboardService";
 import { copyToClipboard } from "@/lib/utils";
+import { BUSINESS_CATEGORIES, getResolvedCategory } from "@/lib/businessCategories";
 
 export default function MyStorePage() {
   const { store, user, refreshStore, loading: storeLoading } = useDashboard();
@@ -28,6 +29,8 @@ export default function MyStorePage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("bakery");
+  const [customCategory, setCustomCategory] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
   const [email, setEmail] = useState("");
@@ -52,6 +55,19 @@ export default function MyStorePage() {
       setPhone(store.phone || "");
       setWhatsapp(store.whatsapp_number || "");
       setIsPublished(store.is_published ?? true);
+
+      if (store.business_category) {
+        const match = BUSINESS_CATEGORIES.find(
+          (c) => c.id === store.business_category || c.name.toLowerCase() === store.business_category?.toLowerCase()
+        );
+        if (match) {
+          setCategory(match.id);
+          setCustomCategory("");
+        } else {
+          setCategory("other");
+          setCustomCategory(store.business_category);
+        }
+      }
     }
   }, [store]);
 
@@ -76,11 +92,14 @@ export default function MyStorePage() {
       return;
     }
 
+    const resolvedCategory = getResolvedCategory(category, customCategory);
+
     try {
       const { data, error } = await updateStore(store.id, {
         name: name.trim(),
         slug: cleanSlug,
         description: description.trim(),
+        business_category: resolvedCategory,
         logo_url: logoUrl.trim(),
         banner_url: bannerUrl.trim(),
         email: email.trim(),
@@ -248,6 +267,41 @@ export default function MyStorePage() {
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full rounded-xl border border-stone-300 px-3.5 py-2.5 text-sm text-charcoal-900 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 bg-stone-50/50 transition-all"
                 />
+              </div>
+
+              {/* What is your business about? */}
+              <div>
+                <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>What is your business about?</span>
+                  <span className="text-[11px] font-normal text-purple-700">Primary Craft</span>
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full rounded-xl border border-stone-300 px-3.5 py-2.5 text-sm text-charcoal-900 bg-stone-50/50 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all cursor-pointer font-medium"
+                >
+                  {BUSINESS_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                {category === "other" && (
+                  <div className="mt-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <label className="block text-[11px] font-medium text-charcoal-600 mb-1">
+                      Custom Business Description:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Resin Jewellery, Terrariums, Vintage Cameras..."
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      className="w-full rounded-xl border border-purple-300 px-3.5 py-2.5 text-sm font-medium text-charcoal-900 placeholder:text-stone-400 bg-purple-50/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
