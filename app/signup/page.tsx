@@ -170,12 +170,32 @@ function SignUpContent() {
         return;
       }
 
-      // Check if email confirmation is required or already confirmed
+      // If session is active, go straight to dashboard
+      if (data.session) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
+      // Try automatic immediate sign-in for seamless onboarding
+      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password: password,
+      });
+
+      if (!signInErr && signInData?.session) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
+      // Fallback only if Supabase dashboard still has email confirmation turned on
       const user = data.user;
       if (user && !user.email_confirmed_at) {
         router.push(`/verify-email?email=${encodeURIComponent(cleanEmail)}&username=${encodeURIComponent(cleanUsername)}`);
       } else {
         router.push("/dashboard");
+        router.refresh();
       }
     } catch (err: any) {
       setServerError(err.message || "An unexpected error occurred during sign up.");

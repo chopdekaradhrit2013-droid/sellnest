@@ -81,10 +81,10 @@ function VerifyEmailContent() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user && user.email_confirmed_at) {
+      if (user) {
         router.push("/dashboard");
       } else {
-        alert("Your email is not verified yet. Please check your inbox and click the verification link.");
+        alert("Your email is not verified yet. Please check your inbox or try logging in.");
       }
     } catch {
       alert("Unable to verify status. Please check your email inbox.");

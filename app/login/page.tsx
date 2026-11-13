@@ -86,10 +86,10 @@ function LoginContent() {
 
       if (error) {
         if (error.message.toLowerCase().includes("email not confirmed")) {
-          router.push(`/verify-email?email=${encodeURIComponent(resolvedEmail)}`);
-          return;
-        }
-        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          setErrorMessage(
+            "Email not confirmed yet. To allow instant logins without manual approval, turn OFF 'Confirm email' in your Supabase Auth settings."
+          );
+        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
           setErrorMessage(
             "Invalid email or password. If you haven't created your SellNest store account yet, please create your account on the Sign Up page first!"
           );
@@ -100,14 +100,7 @@ function LoginContent() {
         return;
       }
 
-      // 3. Check if user email is verified (exempt platform super administrator)
-      const isSuperAdmin = resolvedEmail.toLowerCase().trim() === "chopdekaradhrit2013@gmail.com";
-      if (data.user && !data.user.email_confirmed_at && !isSuperAdmin) {
-        router.push(`/verify-email?email=${encodeURIComponent(data.user.email || resolvedEmail)}`);
-        return;
-      }
-
-      // 4. Successful login -> redirect to destination
+      // Successful login -> redirect directly to destination
       router.push(nextUrl);
       router.refresh();
     } catch (err: any) {

@@ -96,16 +96,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 2. Unverified email protection (exempt platform super administrator)
-  const isSuperAdminUser = user?.email?.toLowerCase().trim() === "chopdekaradhrit2013@gmail.com";
-  if (isProtectedPath && user && !user.email_confirmed_at && user.email && !isSuperAdminUser) {
-    const redirectUrl = new URL("/verify-email", request.url);
-    redirectUrl.searchParams.set("email", user.email);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  // 3. Authenticated & verified users trying to visit /login or /signup
-  if (isAuthPath && user && user.email_confirmed_at) {
+  // 2. Authenticated users trying to visit /login or /signup
+  if (isAuthPath && user) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
