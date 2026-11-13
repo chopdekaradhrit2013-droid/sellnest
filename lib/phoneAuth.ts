@@ -191,3 +191,4 @@ function createSimulatedOtp(phone: string, reason?: string): SendOtpResult {
     message: `Verification code sent to ${phone}. (Test code: ${code} or 123456)`,
   };
 }
+
