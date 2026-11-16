@@ -1093,6 +1093,20 @@ export default function StoreAppearanceBuilderPage() {
                   setInstalledComponents((prev) => Array.from(new Set([...prev, ...packIds])));
                   markDirty();
                 }}
+                currentPlanId={plan?.id || "free"}
+                onUpgradeRequired={(targetPlan, componentTitle) => {
+                  setThemeUpgradeModal({
+                    open: true,
+                    title:
+                      targetPlan === "pro"
+                        ? "Upgrade to Pro (₹199/mo)"
+                        : "Upgrade to Starter (₹99/mo)",
+                    description:
+                      targetPlan === "pro"
+                        ? `"${componentTitle}" is an exclusive Pro component. Upgrade to the Pro plan (₹199/mo) to unlock all 100+ 21st.dev trending components & heros!`
+                        : `"${componentTitle}" is available on the Starter plan (₹99/mo) which unlocks 50% of the trending 21st.dev components catalog!`,
+                  });
+                }}
               />
             )}
           </div>

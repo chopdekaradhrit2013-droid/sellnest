@@ -1,5 +1,7 @@
 export type PlanId = "free" | "starter" | "pro";
 
+export type ComponentPlanTier = "free" | "starter" | "pro";
+
 export type SubscriptionStatus = "active" | "past_due" | "cancelled" | "trialing";
 
 export interface PlanLimits {
@@ -11,6 +13,7 @@ export interface PlanLimits {
   customerInsights: boolean;
   prioritySupport: boolean;
   featuredSections: boolean;
+  componentsTier: ComponentPlanTier;
 }
 
 export interface PlanConfig {
@@ -95,11 +98,13 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       customerInsights: false,
       prioritySupport: false,
       featuredSections: false,
+      componentsTier: "free",
     },
     features: [
       "1 Online storefront",
       "Up to 10 products",
       "Basic themes (Minimal & Modern)",
+      "25 Essential 21st.dev basic components & heros",
       "Direct WhatsApp checkout",
       "Basic order management",
       "Core dashboard stats",
@@ -124,11 +129,13 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       customerInsights: false,
       prioritySupport: true,
       featuredSections: true,
+      componentsTier: "starter",
     },
     features: [
       "1 Online storefront",
       "Up to 100 products",
       "All 4 themes (Boutique & Playful)",
+      "50+ Trending 21st.dev components & heros (50% catalog)",
       "Custom branding & colors",
       "Direct WhatsApp checkout",
       "Advanced order management",
@@ -153,10 +160,12 @@ export const PLANS: Record<PlanId, PlanConfig> = {
       customerInsights: true,
       prioritySupport: true,
       featuredSections: true,
+      componentsTier: "pro",
     },
     features: [
       "1 Online storefront",
       "Unlimited products",
+      "All 100+ Trending 21st.dev components & heroes unlocked",
       "All customization options",
       "Advanced revenue & sales analytics",
       "Full customer insights & repeat metrics",
@@ -204,5 +213,25 @@ export function hasPlanFeature(
 ): boolean {
   const plan = getPlanConfig(planId);
   return Boolean(plan.limits[feature]);
+}
+
+/**
+ * Check if the user's plan tier can use a 21st.dev component
+ * - "free": basic components (~25)
+ * - "starter": half of components (~51) - unlocked on Starter ₹99 & Pro ₹199
+ * - "pro": all 100+ components - unlocked on Pro ₹199
+ */
+export function canUseComponent(
+  userPlanId: string | undefined,
+  requiredTier: ComponentPlanTier
+): boolean {
+  const current = (userPlanId || "free").toLowerCase() as PlanId;
+  const rank: Record<PlanId, number> = { free: 0, starter: 1, pro: 2 };
+  const requiredRank: Record<ComponentPlanTier, number> = { free: 0, starter: 1, pro: 2 };
+
+  const userLevel = rank[current] ?? 0;
+  const neededLevel = requiredRank[requiredTier] ?? 0;
+
+  return userLevel >= neededLevel;
 }
 

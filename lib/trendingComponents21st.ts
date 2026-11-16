@@ -19,6 +19,7 @@ export interface Component21st {
   name: string;
   category: "hero" | "bento" | "banner" | "social_proof" | "badges" | "features" | "footer";
   author: string;
+  requiredPlan: "free" | "starter" | "pro";
   badge?: "Trending 🔥" | "Most Popular" | "New" | "Staff Pick" | "Editor Choice";
   description: string;
   tags: string[];
@@ -47,6 +48,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Ambient Glow Radial Hero",
     category: "hero",
     author: "@aceternity",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Multi-layered radial gradient blur with glowing backdrop and centered bold typography.",
     tags: ["glow", "radial", "gradient", "hero", "ambient"],
@@ -66,6 +68,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Bento Grid Showcase Hero",
     category: "hero",
     author: "@magicui",
+    requiredPlan: "starter",
     badge: "Staff Pick",
     description: "Modern asymmetric bento grid pairing headline with visual feature cards and live stats.",
     tags: ["bento", "grid", "cards", "hero", "stats"],
@@ -87,6 +90,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Split Image Showcase Hero",
     category: "hero",
     author: "@shadcn",
+    requiredPlan: "free",
     badge: "Most Popular",
     description: "Classic dual-column layout with compelling headline on left and visual image collage on right.",
     tags: ["split", "dual-column", "clean", "showcase"],
@@ -108,6 +112,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Spotlight Focus Dark Hero",
     category: "hero",
     author: "@aceternity",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Cinematic dark canvas with dynamic spotlight beam pointing towards your primary call to action.",
     tags: ["spotlight", "dark", "cinematic", "beam"],
@@ -121,6 +126,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Floating Social Proof Badges Hero",
     category: "hero",
     author: "@cult-ui",
+    requiredPlan: "starter",
     badge: "New",
     description: "Hero with interactive floating badges: 4.9★ rating, live orders counter, and WhatsApp quick button.",
     tags: ["floating", "badges", "interactive", "rating"],
@@ -137,6 +143,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Cinematic Canvas Backdrop Hero",
     category: "hero",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     badge: "Editor Choice",
     description: "Full-bleed atmospheric hero with high contrast frosted overlay and warm ambient tones.",
     tags: ["cinematic", "backdrop", "video", "warm"],
@@ -152,6 +159,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Glassmorphic Frosted Glass Hero",
     category: "hero",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Backdrop blur glassmorphism card floating over an organic ambient pastel gradient.",
     tags: ["glassmorphism", "blur", "frost", "clean"],
     codeSnippet: `<div className="p-8 sm:p-14 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl max-w-3xl mx-auto text-center">
@@ -164,6 +172,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Retro Heritage Ribbon Hero",
     category: "hero",
     author: "@fancy-components",
+    requiredPlan: "starter",
     description: "Vintage artisan boutique style with arched decorative ribbon and nostalgic serif typography.",
     tags: ["retro", "vintage", "serif", "ribbon"],
     codeSnippet: `<div className="py-20 text-center bg-amber-50/60 border border-amber-200/60 rounded-3xl space-y-4">
@@ -176,6 +185,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Diagonal Geometric Split Hero",
     category: "hero",
     author: "@cult-ui",
+    requiredPlan: "starter",
     description: "Dynamic angled color split creating strong visual separation between branding and action.",
     tags: ["diagonal", "geometric", "bold", "angular"],
     codeSnippet: `<div className="relative overflow-hidden rounded-3xl bg-zinc-900 text-white p-12">
@@ -189,6 +199,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Full-Bleed Header Hero",
     category: "hero",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     description: "Expansive edge-to-edge photography banner with smooth scrim overlay for maximum visual immersion.",
     tags: ["fullbleed", "banner", "scrim", "immersion"],
     codeSnippet: `<div className="relative h-96 rounded-3xl overflow-hidden flex items-end p-8 text-white">
@@ -203,6 +214,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Dual Action Primary & WhatsApp Hero",
     category: "hero",
     author: "@shadcn",
+    requiredPlan: "starter",
     badge: "Most Popular",
     description: "Conversion-optimized hero featuring instant WhatsApp ordering and interactive catalog browse.",
     tags: ["cta", "whatsapp", "conversion", "sales"],
@@ -219,6 +231,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Storyteller Maker Journey Hero",
     category: "hero",
     author: "@craft-ui",
+    requiredPlan: "free",
     description: "Heartfelt creator introduction with founder note, signature tag, and behind-the-scenes portrait.",
     tags: ["story", "founder", "artisan", "warm"],
     codeSnippet: `<div className="max-w-4xl mx-auto p-8 rounded-3xl bg-stone-50 border border-stone-200 grid md:grid-cols-3 gap-6 items-center">
@@ -233,6 +246,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Neon Glow Cyber Hero",
     category: "hero",
     author: "@aceternity",
+    requiredPlan: "pro",
     description: "High-voltage vibrant border glow and high-tech typography for bold modern brands.",
     tags: ["neon", "cyber", "glow", "vibrant"],
     codeSnippet: `<div className="p-12 rounded-3xl bg-zinc-950 border border-purple-500/40 shadow-[0_0_50px_-12px_rgba(168,85,247,0.4)] text-white text-center">
@@ -244,6 +258,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Pastel Blob & Organic Flow Hero",
     category: "hero",
     author: "@fancy-components",
+    requiredPlan: "starter",
     description: "Soft pastel gradients and flowing curved shapes ideal for cakes, florists, and crafts.",
     tags: ["pastel", "organic", "soft", "curved"],
     codeSnippet: `<div className="py-20 text-center bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 rounded-3xl p-8">
@@ -256,6 +271,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Modern Minimal Grid Hero",
     category: "hero",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Clean Swiss-style grid with subtle dot matrix background and micro-taglines.",
     tags: ["minimal", "swiss", "grid", "clean"],
     codeSnippet: `<div className="py-20 text-center max-w-3xl mx-auto space-y-4">
@@ -268,6 +284,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Multi-Slide Showcase Hero",
     category: "hero",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     description: "Interactive horizontal slide track showing multiple hero campaigns with auto-pagination.",
     tags: ["carousel", "slider", "multi-slide", "gallery"],
     codeSnippet: `<div className="relative rounded-3xl overflow-hidden bg-zinc-900 text-white p-12 text-center">
@@ -280,6 +297,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Live Status & Counter Hero",
     category: "hero",
     author: "@magicui",
+    requiredPlan: "pro",
     description: "Real-time stock indicator badge with countdown to next oven pull.",
     tags: ["counter", "live", "stock", "urgency"],
     codeSnippet: `<div className="py-16 text-center space-y-4">
@@ -294,6 +312,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Luxury Serif Boutique Hero",
     category: "hero",
     author: "@craft-ui",
+    requiredPlan: "free",
     badge: "Editor Choice",
     description: "Fine dining and luxury boutique aesthetics with gold accent lines and classic typography.",
     tags: ["luxury", "serif", "boutique", "gold"],
@@ -307,6 +326,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Quick-Order Fast Commerce Hero",
     category: "hero",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Compact high-density banner with immediate 1-tap cart buttons for rapid ordering.",
     tags: ["commerce", "quick-order", "compact", "speed"],
     codeSnippet: `<div className="p-6 rounded-2xl bg-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -322,6 +342,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "3D Perspective Card Hero",
     category: "hero",
     author: "@aceternity",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Tilt card in 3D perspective showcasing your flagship specialty item.",
     tags: ["3d", "perspective", "tilt", "flagship"],
@@ -337,6 +358,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Interactive Tagline Pill Hero",
     category: "hero",
     author: "@cult-ui",
+    requiredPlan: "starter",
     description: "Hero with interactive clickable feature pills that filter products on click.",
     tags: ["interactive", "pills", "filter", "tags"],
     codeSnippet: `<div className="py-16 text-center space-y-4">
@@ -353,6 +375,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Seasonal Festive Special Hero",
     category: "hero",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Festive celebration banner with holiday sparkles, gift box tags, and limited edition alert.",
     tags: ["festive", "holiday", "seasonal", "gift"],
     codeSnippet: `<div className="py-16 text-center bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white rounded-3xl p-8">
@@ -369,6 +392,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Asymmetric 3-Column Bento Showcase",
     category: "bento",
     author: "@magicui",
+    requiredPlan: "starter",
     badge: "Staff Pick",
     description: "A signature 21st.dev bento layout with hero product on left and dual stacked feature cards on right.",
     tags: ["bento", "asymmetric", "3-column", "showcase"],
@@ -394,6 +418,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Interactive Hover Spotlight Cards",
     category: "bento",
     author: "@aceternity",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Mouse-following radial gradient glow cards illuminating card borders on hover.",
     tags: ["spotlight", "hover", "interactive", "cards"],
@@ -409,6 +434,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "3D Tilt Card with Depth Shadow",
     category: "bento",
     author: "@aceternity",
+    requiredPlan: "pro",
     description: "Smooth 3D parallax tilt on mousemove with elevated drop shadows.",
     tags: ["tilt", "depth", "3d", "shadow"],
     codeSnippet: `<div className="p-6 rounded-2xl bg-white border border-zinc-200/90 shadow-xl hover:-translate-y-1.5 transition-transform">
@@ -421,6 +447,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Minimalist Clean Border Card",
     category: "bento",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Ultra-crisp Scandinavian minimalist product presentation with hairline borders.",
     tags: ["minimalist", "clean", "hairline", "scandinavian"],
     codeSnippet: `<div className="p-5 rounded-2xl bg-white border border-zinc-200 space-y-3">
@@ -436,6 +463,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Glassmorphic Frosted Product Cards",
     category: "bento",
     author: "@cult-ui",
+    requiredPlan: "pro",
     description: "Frosted glass card with blur backing and illuminated white hairline rim.",
     tags: ["glassmorphism", "blur", "frost", "rim"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-white/60 backdrop-blur-md border border-white/80 shadow-md">
@@ -447,6 +475,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Masonry Visual Product Wall",
     category: "bento",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Pinterest-style masonry columns for dynamic heights and rich product storytelling.",
     tags: ["masonry", "wall", "visual", "pinterest"],
     codeSnippet: `<div className="columns-1 sm:columns-2 md:columns-3 gap-4 max-w-6xl mx-auto space-y-4">
@@ -460,6 +489,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Best Seller Ribbon Badge Card",
     category: "bento",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Product card with corner angled ribbon badge indicating best-selling status.",
     tags: ["badge", "ribbon", "bestseller", "tag"],
     codeSnippet: `<div className="relative p-5 rounded-2xl bg-white border border-purple-200 overflow-hidden shadow-xs">
@@ -472,6 +502,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Limited Stock Urgency Card",
     category: "bento",
     author: "@magicui",
+    requiredPlan: "starter",
     description: "Live progress bar showing stock remaining with pulse indicator.",
     tags: ["urgency", "stock", "progress", "pulse"],
     codeSnippet: `<div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-2">
@@ -486,6 +517,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Quick Add Floating Cart Card",
     category: "bento",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Overlay circular plus button with spring bounce animation on hover.",
     tags: ["floating", "cart", "button", "bounce"],
     codeSnippet: `<div className="group relative p-4 rounded-2xl bg-white border border-zinc-200">
@@ -497,6 +529,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Dietary & Allergen Tagged Card",
     category: "bento",
     author: "@cult-ui",
+    requiredPlan: "free",
     description: "Explicit badges for Eggless, Sourdough Fermented, Nut-Free, and Vegan.",
     tags: ["dietary", "eggless", "vegan", "pills"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-white border border-zinc-200 space-y-2">
@@ -511,6 +544,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Before/After Artisan Craft Card",
     category: "bento",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Interactive slider showing raw dough kneading vs golden baked perfection.",
     tags: ["before-after", "craft", "slider", "artisan"],
     codeSnippet: `<div className="p-5 rounded-2xl bg-stone-50 border border-stone-200 text-center">
@@ -522,6 +556,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Feature Comparison Grid",
     category: "bento",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Feature matrix comparing grocery bread with your artisan sourdough.",
     tags: ["comparison", "matrix", "features", "versus"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-zinc-900 text-white max-w-4xl mx-auto space-y-4">
@@ -533,6 +568,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Multi-Angle Thumbnail Product Card",
     category: "bento",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     description: "Mini thumbnail strip under main image for multi-angle bakery product view.",
     tags: ["thumbnail", "carousel", "multi-angle", "gallery"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-white border border-zinc-200 space-y-3">
@@ -548,6 +584,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Price Tag Discount Shimmer Card",
     category: "bento",
     author: "@magicui",
+    requiredPlan: "pro",
     description: "Shimmering animated highlight on bundle pricing tags.",
     tags: ["shimmer", "discount", "bundle", "price"],
     codeSnippet: `<div className="p-5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 flex justify-between items-center">
@@ -560,6 +597,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Chef & Maker Special Pick Card",
     category: "bento",
     author: "@craft-ui",
+    requiredPlan: "starter",
     description: "Featured recommendation card with quote tag from the master baker.",
     tags: ["baker", "recommendation", "chef", "quote"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-amber-50/80 border border-amber-200/90 space-y-3">
@@ -572,6 +610,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Compact Mobile Quick-Row Card",
     category: "bento",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Streamlined horizontal row card optimized for high-speed mobile thumb shopping.",
     tags: ["mobile", "compact", "horizontal", "speed"],
     codeSnippet: `<div className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-zinc-200">
@@ -594,6 +633,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Infinite Running Marquee Ticker",
     category: "banner",
     author: "@magicui",
+    requiredPlan: "starter",
     badge: "Trending 🔥",
     description: "Smooth horizontal scrolling text banner with bakery highlights, delivery alerts, and tags.",
     tags: ["marquee", "ticker", "scrolling", "announcement"],
@@ -614,6 +654,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Shimmer Gradient Top Bar",
     category: "banner",
     author: "@aceternity",
+    requiredPlan: "pro",
     badge: "Staff Pick",
     description: "Animated reflective light beam passing across a vibrant purple gradient banner.",
     tags: ["shimmer", "gradient", "light", "reflective"],
@@ -626,6 +667,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Countdown Flash Sale Bar",
     category: "banner",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Live countdown clock showing hours, minutes, and seconds until today's order cutoff.",
     tags: ["countdown", "clock", "timer", "urgency"],
     codeSnippet: `<div className="bg-amber-500 text-black py-2 px-4 text-center text-xs font-bold flex items-center justify-center gap-2">
@@ -637,6 +679,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Free Shipping Progress Tracker",
     category: "banner",
     author: "@cult-ui",
+    requiredPlan: "starter",
     description: "Dynamic visual progress meter showing how close buyer is to free delivery entitlement.",
     tags: ["shipping", "progress", "meter", "free-delivery"],
     codeSnippet: `<div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center text-xs text-emerald-900 font-medium">
@@ -648,6 +691,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Floating Pill Notification",
     category: "banner",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Floating rounded pill alert with smooth dismissal cross button.",
     tags: ["floating", "pill", "dismissible", "alert"],
     codeSnippet: `<div className="max-w-md mx-auto p-2.5 rounded-full bg-zinc-900 text-white text-xs flex items-center justify-between shadow-xl">
@@ -660,6 +704,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Neon Glow Accent Announcement",
     category: "banner",
     author: "@aceternity",
+    requiredPlan: "pro",
     description: "High-contrast dark bar with pulsing neon cyan/violet glowing accent line.",
     tags: ["neon", "glow", "high-contrast", "dark"],
     codeSnippet: `<div className="bg-black text-white py-2 text-center text-xs font-mono border-b border-purple-500 shadow-sm">
@@ -671,6 +716,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Multi-Message Auto Slide Bar",
     category: "banner",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     description: "Rotating carousel ticker smoothly transitioning between 3 promotional headlines.",
     tags: ["rotating", "slider", "messages", "carousel"],
     codeSnippet: `<div className="bg-zinc-100 py-2 text-center text-xs font-semibold text-zinc-700">
@@ -682,6 +728,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "WhatsApp Live Ping Status Bar",
     category: "banner",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Live connection badge showing baker is currently active and answering on WhatsApp.",
     tags: ["whatsapp", "status", "active", "online"],
     codeSnippet: `<div className="bg-emerald-600 text-white py-1.5 px-4 text-center text-xs font-semibold flex items-center justify-center gap-2">
@@ -694,6 +741,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Local Neighborhood Radius Bar",
     category: "banner",
     author: "@cult-ui",
+    requiredPlan: "free",
     description: "Hyper-local badge confirming delivery radius (e.g. Indiranagar, Koramangala, Whitefield).",
     tags: ["location", "local", "delivery", "radius"],
     codeSnippet: `<div className="bg-purple-50 py-2 text-center text-xs font-semibold text-purple-900 border-b border-purple-100">
@@ -705,6 +753,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Minimalist Hairline Top Tag",
     category: "banner",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Subtle 28px hairline tag at top of page with muted micro-typography.",
     tags: ["minimalist", "hairline", "subtle", "clean"],
     codeSnippet: `<div className="py-1.5 text-center text-[11px] font-mono tracking-wider text-zinc-400 border-b border-zinc-100">
@@ -716,6 +765,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Festive Holiday Ribbon Bar",
     category: "banner",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Warm crimson holiday announcement for Diwali, Christmas, or New Year treats.",
     tags: ["festive", "holiday", "ribbon", "celebration"],
     codeSnippet: `<div className="bg-rose-700 text-white py-2 px-4 text-center text-xs font-bold">
@@ -727,6 +777,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Welcome First-Time Buyer Bar",
     category: "banner",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Personalized welcome message for new visitors with a complimentary gift note.",
     tags: ["welcome", "greeting", "first-time", "gift"],
     codeSnippet: `<div className="bg-amber-100/80 text-amber-900 py-2 text-center text-xs font-bold">
@@ -742,6 +793,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Animated Marquee Reviews Wall",
     category: "social_proof",
     author: "@magicui",
+    requiredPlan: "starter",
     badge: "Trending 🔥",
     description: "Infinitely looping dual-row review cards from genuine verified buyers.",
     tags: ["reviews", "marquee", "social-proof", "infinite"],
@@ -760,6 +812,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Avatar Stack with 4.9★ Aggregate",
     category: "social_proof",
     author: "@shadcn",
+    requiredPlan: "starter",
     badge: "Most Popular",
     description: "Overlapping customer customer avatar circles with gold stars and verified buyer tally.",
     tags: ["avatars", "rating", "stars", "aggregate"],
@@ -780,6 +833,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Verified Buyer Quote Cards",
     category: "social_proof",
     author: "@cult-ui",
+    requiredPlan: "free",
     description: "Clean customer feedback card with verified green checkmark and city badge.",
     tags: ["verified", "quote", "testimonial", "card"],
     codeSnippet: `<div className="p-6 rounded-2xl bg-white border border-zinc-200 shadow-sm space-y-3">
@@ -795,6 +849,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Instagram Social Proof Bento Wall",
     category: "social_proof",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Live visual grid of customer tagged photos with Instagram handle watermark.",
     tags: ["instagram", "bento", "photos", "ugc"],
     codeSnippet: `<div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-5xl mx-auto my-8">
@@ -808,6 +863,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Google 5-Star Reviews Embed Badge",
     category: "social_proof",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Official-style Google G-Logo rating badge with review counter and link.",
     tags: ["google", "rating", "badge", "reviews"],
     codeSnippet: `<div className="inline-flex items-center gap-3 p-3 rounded-2xl bg-white border border-zinc-200 shadow-xs">
@@ -821,6 +877,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Press & Feature Mention Strip",
     category: "social_proof",
     author: "@magicui",
+    requiredPlan: "pro",
     description: "Monochrome logo strip: 'As featured in LBB, Times Food, Bangalore Mirror'.",
     tags: ["press", "features", "media", "logos"],
     codeSnippet: `<div className="py-8 text-center border-y border-zinc-100">
@@ -837,6 +894,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Customer Video Review Card",
     category: "social_proof",
     author: "@motion-primitives",
+    requiredPlan: "pro",
     description: "Vertical reel-style video review thumbnail with play icon overlay.",
     tags: ["video", "reel", "thumbnail", "ugc"],
     codeSnippet: `<div className="relative aspect-[9/16] w-48 rounded-2xl overflow-hidden bg-zinc-900 text-white p-4 flex flex-col justify-between">
@@ -849,6 +907,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Live 'Ordered 3m ago' Toast Notification",
     category: "social_proof",
     author: "@cult-ui",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Floating micro toast in bottom left showing live recent purchase activity.",
     tags: ["toast", "live-orders", "fomo", "urgency"],
@@ -865,6 +924,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "WhatsApp Chat Screenshot Card",
     category: "social_proof",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Authentic chat bubble snippet capturing genuine customer WhatsApp praise.",
     tags: ["chat", "whatsapp", "bubble", "authentic"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-[#EFEAE2] border border-zinc-300 max-w-sm space-y-2">
@@ -878,6 +938,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Star Rating Breakdown Bars",
     category: "social_proof",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Detailed 5★, 4★, 3★ breakdown bars showing 96% 5-star ratio.",
     tags: ["breakdown", "distribution", "ratings", "statistics"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-white border border-zinc-200 max-w-md space-y-2 text-xs">
@@ -895,6 +956,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Community Counter ('2,400+ Foodies')",
     category: "social_proof",
     author: "@magicui",
+    requiredPlan: "starter",
     description: "Animated counting numbers celebrating community orders delivered.",
     tags: ["counter", "community", "milestone", "numbers"],
     codeSnippet: `<div className="p-8 text-center bg-purple-50 rounded-3xl border border-purple-200">
@@ -907,6 +969,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Handwritten Signature Guarantee",
     category: "social_proof",
     author: "@craft-ui",
+    requiredPlan: "free",
     description: "Founder signature stamp guaranteeing pure traditional sourdough craftsmanship.",
     tags: ["signature", "guarantee", "craft", "promise"],
     codeSnippet: `<div className="p-6 rounded-2xl bg-stone-50 border border-stone-200 text-center space-y-2">
@@ -919,6 +982,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Celebration Cake Case Study Card",
     category: "social_proof",
     author: "@fancy-components",
+    requiredPlan: "pro",
     description: "Visual spotlight on custom wedding cake creation with client testimonial.",
     tags: ["case-study", "wedding", "custom", "celebration"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-white border border-zinc-200 flex gap-4 items-center">
@@ -934,6 +998,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Verified Storefront Trust Seal",
     category: "social_proof",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Green verified padlock shield confirming genuine direct-from-artisan store.",
     tags: ["seal", "trust", "verified", "shield"],
     codeSnippet: `<div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800">
@@ -945,6 +1010,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Food Critic Recommendation Quote",
     category: "social_proof",
     author: "@craft-ui",
+    requiredPlan: "pro",
     description: "High-profile foodie recommendation with avatar, publication tag, and quote.",
     tags: ["critic", "foodie", "influencer", "quote"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-zinc-950 text-white space-y-3">
@@ -961,6 +1027,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Shimmer Border Glow Action Button",
     category: "badges",
     author: "@magicui",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "High-conversion CTA button with revolving border shimmer animation.",
     tags: ["shimmer", "button", "cta", "conversion"],
@@ -973,6 +1040,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "WhatsApp Direct Pulse Floating Button",
     category: "badges",
     author: "@shadcn",
+    requiredPlan: "starter",
     badge: "Most Popular",
     description: "Fixed floating WhatsApp bubble in bottom right with pulsing green radar beacon.",
     tags: ["whatsapp", "floating", "pulse", "beacon"],
@@ -988,6 +1056,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Magnetic Kinetic Spring Button",
     category: "badges",
     author: "@aceternity",
+    requiredPlan: "pro",
     description: "Interactive button smoothly shifting toward the user's cursor on proximity.",
     tags: ["magnetic", "kinetic", "spring", "cursor"],
     codeSnippet: `<button className="px-5 py-2.5 rounded-xl bg-zinc-900 text-white font-semibold text-xs hover:bg-black transition-colors shadow-sm">
@@ -999,6 +1068,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Ripple Click Effect Order Button",
     category: "badges",
     author: "@cult-ui",
+    requiredPlan: "pro",
     description: "Material design water-ripple wave originating from the exact click coordinate.",
     tags: ["ripple", "click", "material", "effect"],
     codeSnippet: `<button className="px-5 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs active:bg-purple-700 transition-colors">
@@ -1010,6 +1080,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Animated Green Dot 'Baking Now' Pill",
     category: "badges",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Minimalist pill badge with animated status dot indicating active oven operations.",
     tags: ["live-dot", "pill", "status", "baking"],
     codeSnippet: `<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
@@ -1022,6 +1093,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Floating Quick Cart Counter Drawer",
     category: "badges",
     author: "@magicui",
+    requiredPlan: "pro",
     description: "Floating action pill showing total items, running sum, and checkout button.",
     tags: ["floating", "cart", "drawer", "checkout"],
     codeSnippet: `<div className="p-3 rounded-2xl bg-zinc-950 text-white flex items-center justify-between gap-4 shadow-2xl">
@@ -1034,6 +1106,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Share Storefront Native Mobile Pill",
     category: "badges",
     author: "@cult-ui",
+    requiredPlan: "starter",
     description: "One-click button that invokes mobile native share dialog (WhatsApp, Instagram).",
     tags: ["share", "native", "mobile", "viral"],
     codeSnippet: `<button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium">
@@ -1045,6 +1118,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Copy Store URL Quick Pill",
     category: "badges",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Copy-to-clipboard button with animated 'Copied!' toast feedback.",
     tags: ["copy", "clipboard", "toast", "url"],
     codeSnippet: `<button className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-xs font-bold text-zinc-700 hover:bg-zinc-50">
@@ -1056,6 +1130,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Back-to-Top Floating Chevron",
     category: "badges",
     author: "@fancy-components",
+    requiredPlan: "free",
     description: "Discreet floating arrow returning shoppers to header from bottom of long catalogs.",
     tags: ["back-to-top", "chevron", "scroll", "floating"],
     codeSnippet: `<button className="w-10 h-10 rounded-full bg-white border border-zinc-200 shadow-lg flex items-center justify-center text-zinc-600 hover:text-zinc-900">&uarr;</button>`,
@@ -1065,6 +1140,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Bookmark Storefront Pill",
     category: "badges",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Save / Star button to save this artisan store to buyer's browser favorites.",
     tags: ["bookmark", "favorite", "save", "star"],
     codeSnippet: `<button className="px-3 py-1 rounded-full border border-zinc-200 text-xs text-zinc-600">★ Save Store</button>`,
@@ -1074,6 +1150,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Instagram Direct DM Quick Button",
     category: "badges",
     author: "@cult-ui",
+    requiredPlan: "pro",
     description: "Gradient pink/purple button opening Instagram direct message thread.",
     tags: ["instagram", "dm", "social", "gradient"],
     codeSnippet: `<button className="px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold shadow-sm">DM on Instagram</button>`,
@@ -1083,6 +1160,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "UPI Fast Pay Floating Trigger",
     category: "badges",
     author: "@magicui",
+    requiredPlan: "pro",
     description: "Instant trigger revealing dynamic QR code and 1-click UPI pay link.",
     tags: ["upi", "qr", "fast-pay", "1-click"],
     codeSnippet: `<button className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold">⚡ Pay via UPI</button>`,
@@ -1092,6 +1170,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Pure Vegetarian Green Dot Seal",
     category: "badges",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Standard green square with green inner dot signaling 100% vegetarian / eggless.",
     tags: ["eggless", "vegetarian", "green-dot", "seal"],
     codeSnippet: `<div className="w-4 h-4 rounded-sm border-2 border-emerald-600 flex items-center justify-center">
@@ -1103,6 +1182,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Gluten-Sensitive Grain Tag",
     category: "badges",
     author: "@cult-ui",
+    requiredPlan: "free",
     description: "Specialized amber dietary tag for almond-flour and ancient grain recipes.",
     tags: ["gluten-free", "grain", "dietary", "tag"],
     codeSnippet: `<span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">🌾 Ancient Grain</span>`,
@@ -1116,6 +1196,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "3-Column Visual Trust Icons",
     category: "features",
     author: "@shadcn",
+    requiredPlan: "starter",
     badge: "Most Popular",
     description: "Classic conversion tri-fold: Fresh Daily, 0 Artificial Chemicals, Temperature Safe Delivery.",
     tags: ["trust", "icons", "conversion", "features"],
@@ -1142,6 +1223,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Fermentation Timeline Graphic",
     category: "features",
     author: "@craft-ui",
+    requiredPlan: "pro",
     description: "4-step visual journey: Autolyse (2h) &rarr; Bulk Proof (6h) &rarr; Cold Retard (24h) &rarr; Hearth Bake.",
     tags: ["timeline", "fermentation", "craft", "process"],
     codeSnippet: `<div className="p-8 rounded-3xl bg-stone-50 border border-stone-200 max-w-4xl mx-auto my-8 space-y-4">
@@ -1153,6 +1235,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Hygiene & FSSAI Standards Seal",
     category: "features",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Clean sanitation card highlighting commercial-grade kitchen cleanliness standards.",
     tags: ["hygiene", "fssai", "safety", "cleanliness"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-3">
@@ -1168,6 +1251,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Artisan Maker Bio & Studio Journey",
     category: "features",
     author: "@craft-ui",
+    requiredPlan: "pro",
     badge: "Staff Pick",
     description: "Warm founder profile with portrait, baker story, and neighborhood philosophy.",
     tags: ["founder", "bio", "portrait", "story"],
@@ -1184,6 +1268,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Interactive Accordion FAQ Block",
     category: "features",
     author: "@shadcn",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Collapsible answers to top questions: delivery timings, shelf life, reheating, eggless options.",
     tags: ["faq", "accordion", "answers", "questions"],
@@ -1200,6 +1285,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "3-Step WhatsApp Order Guide",
     category: "features",
     author: "@shadcn",
+    requiredPlan: "starter",
     description: "Visual 1 &rarr; 2 &rarr; 3 infographic explaining frictionless WhatsApp ordering.",
     tags: ["steps", "guide", "infographic", "order"],
     codeSnippet: `<div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto my-8">
@@ -1222,6 +1308,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Operating Hours & Dispatch Schedule",
     category: "features",
     author: "@cult-ui",
+    requiredPlan: "free",
     description: "Clean weekday schedule table showing morning and evening dispatch slots.",
     tags: ["schedule", "hours", "dispatch", "slots"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-zinc-50 border border-zinc-200 max-w-md mx-auto space-y-2 text-xs">
@@ -1240,6 +1327,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Eco-Friendly Box Guarantee",
     category: "features",
     author: "@fancy-components",
+    requiredPlan: "free",
     description: "Sustainability badge explaining unbleached paper boxes and zero plastic packaging.",
     tags: ["eco", "packaging", "sustainable", "zero-plastic"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-stone-100 text-center text-xs text-stone-700">
@@ -1251,6 +1339,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Bulk Catering & Event Inquiries",
     category: "features",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "Callout block for office catering, wedding bread baskets, and birthday treats.",
     tags: ["catering", "events", "bulk", "corporate"],
     codeSnippet: `<div className="p-8 rounded-3xl bg-zinc-900 text-white max-w-3xl mx-auto my-8 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -1266,6 +1355,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Celebration Cake Customization Note",
     category: "features",
     author: "@craft-ui",
+    requiredPlan: "pro",
     description: "Guidance on lead time for custom tier cakes and buttercream messages.",
     tags: ["cake", "custom", "lead-time", "celebration"],
     codeSnippet: `<div className="p-6 rounded-2xl bg-purple-50 border border-purple-200 text-xs space-y-2">
@@ -1278,6 +1368,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Artisan Reheating & Storage Guide",
     category: "features",
     author: "@craft-ui",
+    requiredPlan: "pro",
     description: "Tips on crisping sourdough in toaster or oven for that day-one crackle.",
     tags: ["reheat", "storage", "tips", "oven"],
     codeSnippet: `<div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs space-y-1 text-amber-900">
@@ -1290,6 +1381,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Flavor Profile & Grain Origin Card",
     category: "features",
     author: "@fancy-components",
+    requiredPlan: "free",
     description: "Tasting notes card: lactic acidity, nutty crust, wheaty sweet finish.",
     tags: ["flavor", "tasting", "grain", "notes"],
     codeSnippet: `<div className="p-4 rounded-2xl bg-white border border-zinc-200 text-xs">
@@ -1306,6 +1398,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Multi-Column Modern Footer",
     category: "footer",
     author: "@shadcn",
+    requiredPlan: "starter",
     badge: "Most Popular",
     description: "Comprehensive 4-column footer with brand story, menu links, operating hours, and social icons.",
     tags: ["footer", "multi-column", "links", "social"],
@@ -1339,6 +1432,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "WhatsApp-First High-Contrast Mobile Footer",
     category: "footer",
     author: "@magicui",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Mobile-first footer with prominent WhatsApp call button and 1-tap customer chat.",
     tags: ["footer", "whatsapp", "mobile-first", "high-contrast"],
@@ -1352,6 +1446,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Interactive Studio Directions & Map",
     category: "footer",
     author: "@cult-ui",
+    requiredPlan: "pro",
     description: "Pickup location directions with Google Maps pin button and parking notes.",
     tags: ["map", "directions", "pickup", "location"],
     codeSnippet: `<div className="p-6 rounded-3xl bg-zinc-100 max-w-xl mx-auto text-center space-y-2">
@@ -1365,6 +1460,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Social Media Linktree Cluster",
     category: "footer",
     author: "@fancy-components",
+    requiredPlan: "starter",
     description: "Compact floating badge cluster linking Instagram, Facebook, and WhatsApp.",
     tags: ["social", "linktree", "cluster", "icons"],
     codeSnippet: `<div className="flex justify-center gap-3 py-6">
@@ -1378,6 +1474,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "VIP Weekend Drop Notification Club",
     category: "footer",
     author: "@shadcn",
+    requiredPlan: "pro",
     description: "WhatsApp broadcast signup box for first access to weekend seasonal drops.",
     tags: ["vip", "newsletter", "broadcast", "club"],
     codeSnippet: `<div className="p-8 rounded-3xl bg-purple-900 text-white text-center max-w-xl mx-auto space-y-3">
@@ -1390,6 +1487,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "FSSAI License & Artisan Badge Footer",
     category: "footer",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Legally compliant food license badge and registration details for trust.",
     tags: ["fssai", "license", "legal", "compliance"],
     codeSnippet: `<div className="py-4 text-center text-[10px] text-zinc-400 border-t border-zinc-100">
@@ -1401,6 +1499,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Copyright & Policies Strip",
     category: "footer",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Understated hairline footer with links to Terms, Refund Policy, and Privacy.",
     tags: ["copyright", "policies", "terms", "refund"],
     codeSnippet: `<div className="py-6 text-center text-xs text-zinc-400 border-t border-zinc-100 flex flex-wrap justify-center gap-4">
@@ -1418,6 +1517,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Back to Top with Brand Crest",
     category: "footer",
     author: "@craft-ui",
+    requiredPlan: "pro",
     description: "Centered artisan crest stamp with smooth animated scroll-to-top action.",
     tags: ["back-to-top", "crest", "stamp", "brand"],
     codeSnippet: `<div className="py-8 text-center">
@@ -1429,6 +1529,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Live Open/Closed Status Indicator",
     category: "footer",
     author: "@magicui",
+    requiredPlan: "pro",
     badge: "Trending 🔥",
     description: "Real-time dynamic status badge showing whether orders are actively accepted right now.",
     tags: ["status", "clock", "open", "closed"],
@@ -1442,6 +1543,7 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
     name: "Minimalist Centered Clean Footer",
     category: "footer",
     author: "@shadcn",
+    requiredPlan: "free",
     description: "Compact 1-row minimalist footer ideal for clean, modern stores.",
     tags: ["minimalist", "clean", "centered", "footer"],
     codeSnippet: `<footer className="py-10 text-center text-xs text-zinc-400 border-t border-zinc-100">
@@ -1452,16 +1554,22 @@ export const TRENDING_21ST_COMPONENTS: Component21st[] = [
 ];
 
 /**
- * Helper to filter components by category or search term
+ * Helper to filter components by category, plan tier, or search term
  */
 export function filterComponents21st(
   components: Component21st[],
   category: ComponentCategory = "all",
-  searchQuery = ""
+  searchQuery = "",
+  planTier: "all" | "free" | "starter" | "pro" = "all"
 ): Component21st[] {
   return components.filter((item) => {
     if (category !== "all" && item.category !== category) {
       return false;
+    }
+    if (planTier !== "all") {
+      if (planTier === "free" && item.requiredPlan !== "free") return false;
+      if (planTier === "starter" && item.requiredPlan === "pro") return false;
+      // "pro" includes all
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -1483,3 +1591,4 @@ export function filterComponents21st(
 export function get21stComponentById(id: string): Component21st | undefined {
   return TRENDING_21ST_COMPONENTS.find((c) => c.id === id);
 }
+
