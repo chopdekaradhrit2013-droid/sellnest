@@ -10,7 +10,7 @@ export const ADMIN_COOKIE_NAME = "sellnest_admin_session";
  * Never exposed via PAYMENT_CONFIG or bundled to client components.
  */
 export function getAdminSecretKey(): string {
-  return process.env.ADMIN_SECRET_KEY || "sellnest_admin_secure_key_2026";
+  return process.env.ADMIN_SECRET_KEY || "";
 }
 
 export interface AdminAuthResult {

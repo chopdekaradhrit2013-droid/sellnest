@@ -30,9 +30,13 @@ export async function POST(request: NextRequest) {
     let authenticated = false;
     let authMethod = "password";
 
-    // 1. Password-based authentication (Admin's own account password)
+    // 1. Password-based authentication (Admin's secret passkey or account password)
     if (password) {
-      if (isSupabaseConfigured()) {
+      const adminSecret = getAdminSecretKey();
+      if (adminSecret && password === adminSecret) {
+        authenticated = true;
+        authMethod = "secret_passkey";
+      } else if (isSupabaseConfigured()) {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
@@ -40,30 +44,19 @@ export async function POST(request: NextRequest) {
         });
 
         if (error) {
-          if (password === getAdminSecretKey()) {
-            authenticated = true;
-            authMethod = "secret_passkey_fallback";
-          } else {
-            return NextResponse.json(
-              { error: error.message || "Invalid password for administrator account." },
-              { status: 401 }
-            );
-          }
+          return NextResponse.json(
+            { error: error.message || "Invalid password for administrator account." },
+            { status: 401 }
+          );
         } else {
           authenticated = true;
           authMethod = "supabase_password";
         }
       } else {
-        // Safe development simulation fallback when Supabase is not connected
-        if (password.length >= 6) {
-          authenticated = true;
-          authMethod = "demo_password";
-        } else {
-          return NextResponse.json(
-            { error: "Password must be at least 6 characters." },
-            { status: 401 }
-          );
-        }
+        return NextResponse.json(
+          { error: "Invalid password for administrator account." },
+          { status: 401 }
+        );
       }
     } else if (passkey) {
       // 2. Secret passkey fallback (for automated integration suites & server scripts)

@@ -94,7 +94,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 
 # Admin Passkey (Keep this secret!)
-ADMIN_SECRET_KEY=sellnest_admin_secure_key_2026
+ADMIN_SECRET_KEY=your_admin_secret_key_here
 ADMIN_EMAIL=chopdekaradhrit2013@gmail.com
 NEXT_PUBLIC_SUPPORT_EMAIL=chopdekaradhrit2013@gmail.com
 

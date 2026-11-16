@@ -3,9 +3,33 @@
  * Tests Journeys A, B, C, D, and E across the live application.
  */
 
+import fs from "fs";
+import path from "path";
+
+// Auto-load .env.local without exposing secrets in source code
+try {
+  const envPath = path.resolve(process.cwd(), ".env.local");
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, "utf-8");
+    for (const line of envContent.split("\n")) {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        const key = match[1];
+        let val = (match[2] || "").trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  }
+} catch {}
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
-const ADMIN_PASSKEY = process.env.ADMIN_SECRET_KEY || "sellnest_admin_secure_key_2026";
-const ADMIN_EMAIL = "chopdekaradhrit2013@gmail.com";
+const ADMIN_PASSKEY = process.env.ADMIN_SECRET_KEY || "";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "chopdekaradhrit2013@gmail.com";
 
 let cookieJar = "";
 
@@ -225,7 +249,7 @@ async function main() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: ADMIN_EMAIL,
-        passkey: process.env.ADMIN_SECRET_KEY || "sellnest_admin_secure_key_2026",
+        passkey: ADMIN_PASSKEY,
       }),
     });
 
