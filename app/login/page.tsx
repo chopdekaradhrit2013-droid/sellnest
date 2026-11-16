@@ -85,6 +85,27 @@ function LoginContent() {
       });
 
       if (error) {
+        // Fallback: Check if this is the Super Admin signing in with the master admin passkey
+        try {
+          const adminRes = await fetch("/api/admin/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: resolvedEmail,
+              password,
+            }),
+          });
+          if (adminRes.ok) {
+            const adminData = await adminRes.json();
+            if (adminData.success) {
+              const target = nextUrl === "/dashboard" ? "/admin" : nextUrl;
+              router.push(target);
+              router.refresh();
+              return;
+            }
+          }
+        } catch {}
+
         if (error.message.toLowerCase().includes("email not confirmed")) {
           setErrorMessage(
             "Email not confirmed yet. To allow instant logins without manual approval, turn OFF 'Confirm email' in your Supabase Auth settings."

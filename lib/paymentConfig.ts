@@ -59,9 +59,10 @@ export const PAYMENT_CONFIG: PaymentConfig = {
   // Turnaround promise
   processingPromiseHours: 24,
 
-  // Authorized Admin emails
+  // Authorized Admin emails (Supports both owner addresses)
   adminEmails: [
     "chopdekaradhrit2013@gmail.com",
+    "adhritchopdekar2013@gmail.com",
     (process.env.ADMIN_EMAIL || "").toLowerCase(),
     (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase(),
   ].filter(Boolean),

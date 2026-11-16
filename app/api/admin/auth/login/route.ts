@@ -30,13 +30,15 @@ export async function POST(request: NextRequest) {
     let authenticated = false;
     let authMethod = "password";
 
-    // 1. Password-based authentication (Admin's secret passkey or account password)
-    if (password) {
-      const adminSecret = getAdminSecretKey();
-      if (adminSecret && password === adminSecret) {
-        authenticated = true;
-        authMethod = "secret_passkey";
-      } else if (isSupabaseConfigured()) {
+    const enteredKey = (password || passkey || "").trim();
+    const adminSecret = getAdminSecretKey();
+
+    // 1. Secret Passkey / Master Password check
+    if (adminSecret && (enteredKey === adminSecret || password === adminSecret || passkey === adminSecret)) {
+      authenticated = true;
+      authMethod = "secret_passkey";
+    } else if (password) {
+      if (isSupabaseConfigured()) {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
@@ -55,17 +57,6 @@ export async function POST(request: NextRequest) {
       } else {
         return NextResponse.json(
           { error: "Invalid password for administrator account." },
-          { status: 401 }
-        );
-      }
-    } else if (passkey) {
-      // 2. Secret passkey fallback (for automated integration suites & server scripts)
-      if (passkey === getAdminSecretKey()) {
-        authenticated = true;
-        authMethod = "secret_passkey";
-      } else {
-        return NextResponse.json(
-          { error: "Invalid administrator security passkey." },
           { status: 401 }
         );
       }
@@ -95,7 +86,7 @@ export async function POST(request: NextRequest) {
       name: ADMIN_COOKIE_NAME,
       value: sessionValue,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: request.nextUrl.protocol === "https:",
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
