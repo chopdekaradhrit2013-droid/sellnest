@@ -107,8 +107,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      const discountAmount = Math.max(0, Number(customer.discount_amount) || 0);
       const deliveryFee = trustedSubtotal >= 1000 ? 0 : 60;
-      const finalTotal = trustedSubtotal + deliveryFee;
+      const finalTotal = Math.max(0, trustedSubtotal + deliveryFee - discountAmount);
       const orderCode = `SN-${Math.floor(100000 + Math.random() * 900000)}`;
 
       const { data: createdOrder, error: createErr } = await createOrder(
@@ -122,6 +123,12 @@ export async function POST(request: NextRequest) {
           city: customer.city?.trim() || "Bengaluru",
           state: customer.state?.trim() || "Karnataka",
           pincode: customer.pincode?.trim() || "560001",
+          delivery_date: customer.delivery_date?.trim(),
+          delivery_slot: customer.delivery_slot?.trim(),
+          custom_message: customer.custom_message?.trim(),
+          dietary_preference: customer.dietary_preference?.trim(),
+          discount_amount: discountAmount,
+          promo_code: customer.promo_code?.trim(),
           subtotal_amount: trustedSubtotal,
           delivery_fee: deliveryFee,
           total_amount: finalTotal,
@@ -375,8 +382,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const discountAmount = Math.max(0, Number(customer.discount_amount) || 0);
     const deliveryFee = trustedSubtotal >= 1000 ? 0 : 60;
-    const trustedTotal = trustedSubtotal + deliveryFee;
+    const trustedTotal = Math.max(0, trustedSubtotal + deliveryFee - discountAmount);
     const orderCode = `SN-${Math.floor(100000 + Math.random() * 900000)}`;
 
     // 4. Create Order record
@@ -392,6 +400,12 @@ export async function POST(request: NextRequest) {
         city: customer.city?.trim() || "Bengaluru",
         state: customer.state?.trim() || "Karnataka",
         pincode: customer.pincode?.trim() || "560001",
+        delivery_date: customer.delivery_date?.trim() || null,
+        delivery_slot: customer.delivery_slot?.trim() || null,
+        custom_message: customer.custom_message?.trim() || null,
+        dietary_preference: customer.dietary_preference?.trim() || null,
+        discount_amount: discountAmount,
+        promo_code: customer.promo_code?.trim() || null,
         subtotal_amount: trustedSubtotal,
         delivery_fee: deliveryFee,
         total_amount: trustedTotal,

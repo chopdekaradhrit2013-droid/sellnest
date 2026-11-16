@@ -17,6 +17,13 @@ import {
   Loader2,
   Sparkles,
   Store as StoreIcon,
+  Calendar,
+  Clock,
+  Gift,
+  Tag,
+  Percent,
+  Heart,
+  CheckCircle2,
 } from "lucide-react";
 import { Store, Product } from "@/lib/types";
 import { formatINR } from "@/lib/utils";
@@ -43,6 +50,27 @@ export default function CheckoutPage() {
   const [stateName, setStateName] = useState("Karnataka");
   const [pincode, setPincode] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Delivery Schedule & Customization (Bakers & Artisanal Makers)
+  const getRelativeDate = (offsetDays: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    return d.toISOString().split("T")[0];
+  };
+
+  const [deliveryDate, setDeliveryDate] = useState(() => getRelativeDate(1));
+  const [deliverySlot, setDeliverySlot] = useState("Afternoon (1 PM - 5 PM)");
+  const [customMessage, setCustomMessage] = useState("");
+  const [dietaryPreference, setDietaryPreference] = useState("Standard");
+
+  // Promo Code State
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discount: number;
+    description: string;
+  } | null>(null);
+  const [promoMsg, setPromoMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Submitting & Error states
   const [submitting, setSubmitting] = useState(false);
@@ -127,7 +155,51 @@ export default function CheckoutPage() {
     return subtotal >= 1000 ? 0 : 60;
   }, [cartItems, subtotal]);
 
-  const finalTotal = subtotal + deliveryFee;
+  const discountAmount = appliedPromo ? appliedPromo.discount : 0;
+  const finalTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
+
+  const handleApplyPromo = () => {
+    setPromoMsg(null);
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+
+    if (code === "WELCOME10") {
+      const disc = Math.round(subtotal * 0.1);
+      setAppliedPromo({
+        code: "WELCOME10",
+        discount: Math.min(disc, 150),
+        description: "10% Welcome Discount applied",
+      });
+      setPromoMsg({ type: "success", text: "Coupon WELCOME10 applied successfully! Saved " + formatINR(Math.min(disc, 150)) });
+    } else if (code === "FESTIVE50") {
+      if (subtotal < 350) {
+        setPromoMsg({ type: "error", text: "FESTIVE50 requires a minimum order of ₹350." });
+        return;
+      }
+      setAppliedPromo({
+        code: "FESTIVE50",
+        discount: 50,
+        description: "Flat ₹50 Festive discount",
+      });
+      setPromoMsg({ type: "success", text: "Flat ₹50 discount applied!" });
+    } else if (code === "FIRSTORDER") {
+      const disc = Math.round(subtotal * 0.15);
+      setAppliedPromo({
+        code: "FIRSTORDER",
+        discount: Math.min(disc, 200),
+        description: "15% First Order discount",
+      });
+      setPromoMsg({ type: "success", text: "15% First Order discount applied! Saved " + formatINR(Math.min(disc, 200)) });
+    } else {
+      setPromoMsg({ type: "error", text: "Invalid promo code. Try WELCOME10 or FESTIVE50." });
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoMsg(null);
+  };
 
   // Validation
   const validateForm = () => {
@@ -200,6 +272,12 @@ export default function CheckoutPage() {
             city: city.trim(),
             state: stateName.trim(),
             pincode: pincode.trim(),
+            delivery_date: deliveryDate,
+            delivery_slot: deliverySlot,
+            custom_message: customMessage.trim() || undefined,
+            dietary_preference: dietaryPreference,
+            discount_amount: discountAmount,
+            promo_code: appliedPromo?.code || undefined,
             notes: notes.trim() || undefined,
           },
           items: cartItems.map((it) => ({
@@ -458,15 +536,165 @@ export default function CheckoutPage() {
                   {/* Special Notes / Instructions */}
                   <div>
                     <label className="block font-semibold text-zinc-700 mb-1">
-                      Order Instructions / Notes on Cake <span className="text-zinc-400 font-normal">(Optional)</span>
+                      Delivery Landmarks / Extra Notes <span className="text-zinc-400 font-normal">(Optional)</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Please leave at door, message on card: Happy Birthday Rahul!"
+                      placeholder="e.g. Near Indiranagar Metro, leave at security"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500"
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: DELIVERY SCHEDULE & CELEBRATION CUSTOMIZATION */}
+              <div className="bg-white p-6 sm:p-7 rounded-2xl border border-zinc-200 shadow-xs space-y-5">
+                <div className="border-b border-zinc-100 pb-3 flex items-center justify-between">
+                  <h2 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-purple-600" />
+                    <span>2. Delivery Schedule &amp; Preferences</span>
+                  </h2>
+                  <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    Freshly Prepared
+                  </span>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  {/* Delivery Date Selection */}
+                  <div>
+                    <label className="block font-semibold text-zinc-700 mb-2 flex items-center justify-between">
+                      <span>Preferred Delivery Date *</span>
+                      <span className="text-[10px] text-zinc-400 font-normal">Select when you need this</span>
+                    </label>
+
+                    {/* Quick Date Chips */}
+                    <div className="grid grid-cols-3 gap-2 mb-2.5">
+                      {[
+                        { label: "Today", date: getRelativeDate(0) },
+                        { label: "Tomorrow", date: getRelativeDate(1) },
+                        { label: "Day After", date: getRelativeDate(2) },
+                      ].map((item) => {
+                        const isSelected = deliveryDate === item.date;
+                        return (
+                          <button
+                            type="button"
+                            key={item.label}
+                            onClick={() => setDeliveryDate(item.date)}
+                            className={`py-2 px-3 rounded-xl border text-center font-medium transition-all ${
+                              isSelected
+                                ? "bg-purple-600 text-white border-purple-600 shadow-xs"
+                                : "bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                            }`}
+                          >
+                            <span className="block font-bold text-xs">{item.label}</span>
+                            <span className={`text-[10px] block ${isSelected ? "text-purple-100" : "text-zinc-400"}`}>
+                              {new Date(item.date).toLocaleDateString("en-IN", {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-zinc-500 text-[11px] shrink-0">Or pick custom date:</span>
+                      <input
+                        type="date"
+                        min={getRelativeDate(0)}
+                        max={getRelativeDate(30)}
+                        value={deliveryDate}
+                        onChange={(e) => setDeliveryDate(e.target.value)}
+                        className="px-3 py-1.5 rounded-lg border border-zinc-300 text-xs text-zinc-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Delivery Slot Selection */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <label className="block font-semibold text-zinc-700 mb-2 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>Preferred Delivery Time Slot *</span>
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {[
+                        { id: "Morning (10 AM - 1 PM)", title: "Morning", time: "10 AM – 1 PM" },
+                        { id: "Afternoon (1 PM - 5 PM)", title: "Afternoon", time: "1 PM – 5 PM" },
+                        { id: "Evening (5 PM - 8 PM)", title: "Evening", time: "5 PM – 8 PM" },
+                      ].map((slot) => {
+                        const isSelected = deliverySlot === slot.id;
+                        return (
+                          <button
+                            type="button"
+                            key={slot.id}
+                            onClick={() => setDeliverySlot(slot.id)}
+                            className={`p-2.5 rounded-xl border text-left transition-all ${
+                              isSelected
+                                ? "bg-purple-50/70 border-purple-500 text-purple-900 shadow-2xs"
+                                : "bg-white border-zinc-200 text-zinc-700 hover:border-zinc-300"
+                            }`}
+                          >
+                            <span className="font-bold text-xs block">{slot.title}</span>
+                            <span className="text-[10px] text-zinc-500 block">{slot.time}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Custom Message on Cake / Gift Note */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <label className="block font-semibold text-zinc-700 mb-1 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Gift className="w-3.5 h-3.5 text-purple-600" />
+                        <span>Message on Cake / Box Greeting</span>
+                      </span>
+                      <span className="text-[10px] text-zinc-400 font-normal">Optional &bull; Max 80 chars</span>
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={80}
+                      placeholder="e.g. Happy 25th Birthday Rhea! 🎂"
+                      value={customMessage}
+                      onChange={(e) => setCustomMessage(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-300 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder:text-zinc-400"
+                    />
+                  </div>
+
+                  {/* Dietary Preference Selection */}
+                  <div className="pt-2 border-t border-zinc-100">
+                    <label className="block font-semibold text-zinc-700 mb-2 flex items-center gap-1.5">
+                      <Heart className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Dietary Preference</span>
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        "Standard",
+                        "100% Eggless 🌱",
+                        "Gluten-Free 🌾",
+                        "Less Sugar 🍯",
+                        "Nut-Free 🚫🥜",
+                      ].map((diet) => {
+                        const isSelected = dietaryPreference === diet;
+                        return (
+                          <button
+                            type="button"
+                            key={diet}
+                            onClick={() => setDietaryPreference(diet)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                              isSelected
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-2xs"
+                                : "bg-zinc-50 border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                            }`}
+                          >
+                            {diet}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -545,12 +773,78 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Promo / Coupon Code */}
+                <div className="border-t border-zinc-100 pt-3">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Tag className="w-3.5 h-3.5 text-purple-600" />
+                    <span className="text-xs font-bold text-zinc-900">Have a coupon code?</span>
+                  </div>
+
+                  {!appliedPromo ? (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. WELCOME10"
+                          value={promoInput}
+                          onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                          className="flex-1 px-3 py-1.5 rounded-xl border border-zinc-300 font-mono text-xs uppercase focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyPromo}
+                          className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-2xs transition-colors"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-zinc-400">
+                        Try codes: <strong className="text-purple-700">WELCOME10</strong> (10% off) or <strong className="text-purple-700">FESTIVE50</strong> (₹50 off)
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+                      <div>
+                        <div className="flex items-center gap-1 text-emerald-800 font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{appliedPromo.code}</span>
+                        </div>
+                        <span className="text-[10px] text-emerald-700">{appliedPromo.description}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemovePromo}
+                        className="text-[11px] font-semibold text-red-600 hover:text-red-700 underline ml-2"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+
+                  {promoMsg && !appliedPromo && (
+                    <p
+                      className={`text-[11px] mt-1.5 ${
+                        promoMsg.type === "success" ? "text-emerald-600 font-medium" : "text-red-500"
+                      }`}
+                    >
+                      {promoMsg.text}
+                    </p>
+                  )}
+                </div>
+
                 {/* Pricing Breakdown */}
                 <div className="border-t border-zinc-100 pt-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between text-zinc-600">
                     <span>Subtotal</span>
                     <span className="font-semibold text-zinc-900">{formatINR(subtotal)}</span>
                   </div>
+
+                  {appliedPromo && (
+                    <div className="flex items-center justify-between text-emerald-700 font-medium">
+                      <span>Discount ({appliedPromo.code})</span>
+                      <span>-{formatINR(discountAmount)}</span>
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between text-zinc-600">
                     <span className="flex items-center gap-1">

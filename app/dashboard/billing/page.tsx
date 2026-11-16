@@ -57,6 +57,7 @@ export default function BillingPage() {
   const [upgradeRequests, setUpgradeRequests] = useState<SubscriptionUpgradeRequest[]>([]);
 
   // Upgrade & Downgrade modal states
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [targetPlanToChange, setTargetPlanToChange] = useState<PlanConfig | null>(null);
   const [modalType, setModalType] = useState<"upgrade" | "downgrade" | null>(null);
   const [receiptModalInvoice, setReceiptModalInvoice] = useState<BillingInvoice | null>(null);
@@ -198,6 +199,8 @@ export default function BillingPage() {
           sellerName: sellerName || user?.full_name || "Seller",
           sellerEmail: sellerEmail || user?.email || "",
           targetPlanId: targetPlanToChange.id,
+          amount: billingCycle === "yearly" ? targetPlanToChange.priceYearly : targetPlanToChange.priceMonthly,
+          billingCycle,
           paymentMethod: PAYMENT_CONFIG.paymentMethod,
           transactionReference: transactionRef.trim(),
           paymentDate: paymentDate || new Date().toISOString().split("T")[0],
@@ -280,6 +283,14 @@ export default function BillingPage() {
     : Math.min(100, Math.round((productCount / currentPlanMax) * 100));
 
   const pendingUpgradeRequest = upgradeRequests.find((r) => r.status === "pending");
+
+  const isYearlyUpgrade = billingCycle === "yearly";
+  const targetUpgradePrice = targetPlanToChange
+    ? (isYearlyUpgrade ? (targetPlanToChange.priceYearly || targetPlanToChange.priceMonthly * 10) : targetPlanToChange.priceMonthly)
+    : 0;
+  const upiPlanNote = targetPlanToChange
+    ? `SellNest ${targetPlanToChange.name} ${isYearlyUpgrade ? "Annual" : "Monthly"} Plan`
+    : "";
 
   if (contextLoading || loading) {
     return (
@@ -499,12 +510,45 @@ export default function BillingPage() {
       </div>
 
       {/* 2. PLAN COMPARISON CARDS */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-bold text-charcoal-950">Select a Subscription Tier</h3>
-          <p className="text-xs sm:text-sm text-charcoal-500">
-            Upgrade your store securely. Manual payments are verified and activated within 24 hours.
-          </p>
+      <div className="space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-charcoal-950">Select a Subscription Tier</h3>
+            <p className="text-xs sm:text-sm text-charcoal-500">
+              Upgrade your store securely. Manual payments are verified and activated within 24 hours.
+            </p>
+          </div>
+
+          {/* Billing Cycle Toggle */}
+          <div className="inline-flex items-center p-1 rounded-2xl bg-stone-100 border border-stone-200 self-start sm:self-auto shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setBillingCycle("monthly")}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                billingCycle === "monthly"
+                  ? "bg-white text-charcoal-950 shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setBillingCycle("yearly")}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                billingCycle === "yearly"
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "text-stone-500 hover:text-stone-800"
+              }`}
+            >
+              <span>Annual</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                billingCycle === "yearly" ? "bg-white text-purple-700" : "bg-emerald-100 text-emerald-800"
+              }`}>
+                Save 17% (2 Mo Free)
+              </span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -512,6 +556,9 @@ export default function BillingPage() {
             const p = PLANS[pid];
             const isCurrent = plan.id === pid;
             const isTargetPending = pendingUpgradeRequest?.target_plan_id === pid;
+            const isYearly = billingCycle === "yearly";
+            const displayPrice = isYearly ? p.priceYearly : p.priceMonthly;
+            const monthlyEquivalent = isYearly && p.priceYearly > 0 ? Math.round(p.priceYearly / 12) : null;
 
             return (
               <div
@@ -565,11 +612,20 @@ export default function BillingPage() {
                   <div className="my-5 pb-5 border-b border-stone-100">
                     <div className="flex items-baseline gap-1">
                       <span className="text-3xl font-extrabold text-charcoal-950 font-sans">
-                        ₹{p.priceMonthly}
+                        ₹{displayPrice}
                       </span>
-                      <span className="text-xs font-semibold text-charcoal-400">/month</span>
+                      <span className="text-xs font-semibold text-charcoal-400">
+                        {isYearly ? "/year" : "/month"}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-stone-400 block">
+
+                    {monthlyEquivalent && (
+                      <span className="text-[11px] font-bold text-purple-700 block mt-0.5">
+                        ₹{monthlyEquivalent}/mo &bull; Save 2 months free!
+                      </span>
+                    )}
+
+                    <span className="text-[11px] text-stone-400 block mt-1">
                       Verified payment via UPI / Bank Transfer
                     </span>
                     {p.priceMonthly > 0 && (
@@ -1003,9 +1059,16 @@ export default function BillingPage() {
                   <div>
                     <span className="text-xs text-purple-900 font-semibold">Total Amount to Pay</span>
                     <div className="text-3xl font-black text-purple-950 font-sans mt-0.5">
-                      ₹{targetPlanToChange.priceMonthly}
-                      <span className="text-xs font-semibold text-purple-700 font-normal"> / month</span>
+                      ₹{targetUpgradePrice}
+                      <span className="text-xs font-semibold text-purple-700 font-normal">
+                        {isYearlyUpgrade ? " / year (12 months)" : " / month"}
+                      </span>
                     </div>
+                    {isYearlyUpgrade && (
+                      <span className="text-[11px] font-bold text-purple-700 block mt-0.5">
+                        Includes 2 Months Free (₹{Math.round(targetUpgradePrice / 12)}/mo equivalent)
+                      </span>
+                    )}
                   </div>
                   <span className="text-[11px] font-bold text-purple-800 bg-white px-3 py-1.5 rounded-xl border border-purple-200 shadow-xs">
                     0% Convenience Fee
@@ -1029,17 +1092,17 @@ export default function BillingPage() {
                     {/* 1-Click UPI Payment Button */}
                     <div>
                       <a
-                        href={getUpiPaymentUri(targetPlanToChange.priceMonthly, targetPlanToChange.name)}
+                        href={getUpiPaymentUri(targetUpgradePrice, upiPlanNote)}
                         className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-500/20 active:scale-[0.99] transition-all cursor-pointer"
                       >
                         <Zap className="w-4 h-4 fill-amber-300 text-amber-300 animate-pulse" />
-                        <span>Pay ₹{targetPlanToChange.priceMonthly} in 1-Click via UPI App</span>
+                        <span>Pay ₹{targetUpgradePrice} in 1-Click via UPI App</span>
                         <ExternalLink className="w-4 h-4 text-purple-200" />
                       </a>
                       <p className="text-[11px] text-charcoal-500 text-center mt-1.5 flex items-center justify-center gap-1">
                         <Smartphone className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                         <span>
-                          On mobile, opens <strong>Google Pay</strong>, <strong>PhonePe</strong>, or <strong>Paytm</strong> with ₹{targetPlanToChange.priceMonthly} pre-filled.
+                          On mobile, opens <strong>Google Pay</strong>, <strong>PhonePe</strong>, or <strong>Paytm</strong> with ₹{targetUpgradePrice} pre-filled.
                         </span>
                       </p>
                     </div>
@@ -1057,20 +1120,20 @@ export default function BillingPage() {
                     <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-xs flex flex-col items-center text-center">
                       <div className="relative inline-block bg-white p-2.5 rounded-xl border border-stone-200 shadow-2xs">
                         <img
-                          src={getUpiQrCodeUrl(targetPlanToChange.priceMonthly, targetPlanToChange.name, 240)}
+                          src={getUpiQrCodeUrl(targetUpgradePrice, upiPlanNote, 240)}
                           onError={(e) => {
                             e.currentTarget.src = getFallbackUpiQrCodeUrl(
-                              targetPlanToChange.priceMonthly,
-                              targetPlanToChange.name,
+                              targetUpgradePrice,
+                              upiPlanNote,
                               240
                             );
                           }}
-                          alt={`UPI QR Code for ₹${targetPlanToChange.priceMonthly} (${targetPlanToChange.name} Plan)`}
+                          alt={`UPI QR Code for ₹${targetUpgradePrice} (${targetPlanToChange.name} Plan)`}
                           className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-lg"
                         />
                         <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-charcoal-900 text-white text-[10px] font-bold tracking-wide shadow-sm whitespace-nowrap flex items-center gap-1">
                           <Check className="w-3 h-3 text-emerald-400" />
-                          <span>₹{targetPlanToChange.priceMonthly} Pre-configured</span>
+                          <span>₹{targetUpgradePrice} Pre-configured</span>
                         </div>
                       </div>
 
@@ -1080,8 +1143,9 @@ export default function BillingPage() {
                       <p className="text-[11px] text-charcoal-500 mt-0.5">
                         Payee: <strong className="text-charcoal-800">{PAYMENT_CONFIG.bankDetails.accountName}</strong>
                       </p>
+                    </div>
 
-                      {/* Supported App Badges */}
+                    {/* Supported App Badges */}
                       <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2.5">
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 text-charcoal-700 border border-stone-200">
                           Google Pay
@@ -1099,7 +1163,6 @@ export default function BillingPage() {
                           CRED
                         </span>
                       </div>
-                    </div>
 
                     {/* Manual Details & Bank Accordion */}
                     <div className="pt-2 border-t border-stone-200/70 space-y-2.5">
@@ -1171,7 +1234,7 @@ export default function BillingPage() {
                     <div>
                       <p className="font-bold">Next: Submit your 12-digit UTR below</p>
                       <p className="opacity-90">
-                        After transferring ₹{targetPlanToChange.priceMonthly}, copy the 12-digit UTR / Reference number from your payment app screen and paste it into Step 2 below. Plans are activated within {PAYMENT_CONFIG.processingPromiseHours} hours.
+                        After transferring ₹{targetUpgradePrice}, copy the 12-digit UTR / Reference number from your payment app screen and paste it into Step 2 below. Plans are activated within {PAYMENT_CONFIG.processingPromiseHours} hours.
                       </p>
                     </div>
                   </div>
@@ -1203,7 +1266,7 @@ export default function BillingPage() {
                       <input
                         type="text"
                         disabled
-                        value={`${targetPlanToChange.name} Plan (₹${targetPlanToChange.priceMonthly}/mo)`}
+                        value={`${targetPlanToChange.name} Plan (₹${targetUpgradePrice}${isYearlyUpgrade ? "/year" : "/mo"})`}
                         className="w-full p-2.5 rounded-xl border border-stone-200 bg-stone-100 text-charcoal-500 font-bold"
                       />
                     </div>

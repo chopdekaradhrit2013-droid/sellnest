@@ -439,6 +439,11 @@ export default function StorefrontView({
 
                   {/* Dietary / Feature Badges */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                    {prod.is_sold_out ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white shadow-xs">
+                        Sold Out Today
+                      </span>
+                    ) : null}
                     {prod.is_eggless && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/95 text-white backdrop-blur-xs shadow-xs">
                         Eggless
@@ -486,20 +491,26 @@ export default function StorefrontView({
                       <span className="font-bold text-base text-zinc-900">{formatINR(prod.price)}</span>
                     </div>
 
-                    <button
-                      onClick={(e) => addToCart(prod.id, e)}
-                      className={`px-3 py-1.5 text-xs font-semibold transition-all shadow-xs text-white flex items-center gap-1 ${s.buttonRadius}`}
-                      style={{ backgroundColor: primaryColor }}
-                    >
-                      {justAddedId === prod.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Added</span>
-                        </>
-                      ) : (
-                        <span>+ Add to Bag</span>
-                      )}
-                    </button>
+                    {prod.is_sold_out ? (
+                      <span className={`px-3 py-1.5 text-xs font-semibold bg-zinc-100 text-zinc-400 cursor-not-allowed ${s.buttonRadius}`}>
+                        Sold Out
+                      </span>
+                    ) : (
+                      <button
+                        onClick={(e) => addToCart(prod.id, e)}
+                        className={`px-3 py-1.5 text-xs font-semibold transition-all shadow-xs text-white flex items-center gap-1 ${s.buttonRadius}`}
+                        style={{ backgroundColor: primaryColor }}
+                      >
+                        {justAddedId === prod.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Added</span>
+                          </>
+                        ) : (
+                          <span>+ Add to Bag</span>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -634,6 +645,11 @@ export default function StorefrontView({
                     )}
 
                     <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1">
+                      {prod.is_sold_out ? (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-600 text-white shadow-xs">
+                          Sold Out Today
+                        </span>
+                      ) : null}
                       {prod.is_eggless && (
                         <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-600 text-white shadow-xs">
                           100% Veg
@@ -674,9 +690,16 @@ export default function StorefrontView({
 
                   {/* Body Info */}
                   <div className="p-4">
-                    <span className="text-[10px] font-semibold tracking-wider uppercase text-zinc-400 block mb-1">
-                      {prod.category}
-                    </span>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[10px] font-semibold tracking-wider uppercase text-zinc-400 block">
+                        {prod.category}
+                      </span>
+                      {prod.variants && prod.variants.length > 0 && (
+                        <span className="text-[9px] font-bold text-zinc-600 bg-zinc-100 px-1.5 py-0.2 rounded border border-zinc-200">
+                          {prod.variants.length} Sizes
+                        </span>
+                      )}
+                    </div>
                     <h4 className="font-semibold text-sm sm:text-base text-zinc-900 leading-snug">
                       {prod.name}
                     </h4>
@@ -695,7 +718,11 @@ export default function StorefrontView({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {cart[prod.id] ? (
+                    {prod.is_sold_out ? (
+                      <span className={`px-2.5 py-1 text-xs font-semibold bg-zinc-100 text-zinc-400 cursor-not-allowed ${s.buttonRadius}`}>
+                        Sold Out
+                      </span>
+                    ) : cart[prod.id] ? (
                       <div className="flex items-center bg-zinc-100 rounded-lg p-0.5 border border-zinc-200">
                         <button
                           onClick={(e) => updateQuantity(prod.id, -1, e)}
@@ -838,12 +865,14 @@ export default function StorefrontView({
             )}
             <span>•</span>
             <div className="flex items-center gap-1.5">
-              <span>Powered by</span>
               <Link
-                href="/"
-                className="font-bold text-zinc-900 hover:text-purple-600 transition-colors"
+                href="/?ref=storefront_badge"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200/80 font-medium text-[11px] transition-all hover:scale-105 shadow-2xs group"
               >
-                SellNest
+                <Sparkles className="w-3 h-3 text-purple-600 transition-transform group-hover:rotate-12" />
+                <span>Powered by <strong>SellNest</strong> &bull; Start your free store &rarr;</span>
               </Link>
             </div>
           </div>

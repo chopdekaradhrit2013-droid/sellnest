@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -41,8 +41,9 @@ export default function ProductDetailPage() {
   // Gallery state
   const [selectedImage, setSelectedImage] = useState<string>("");
 
-  // Quantity state
+  // Quantity & Variant state
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [addedToast, setAddedToast] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
@@ -90,6 +91,10 @@ export default function ProductDetailPage() {
           const initialImg = prod.images?.[0] || prod.image_url || "";
           setSelectedImage(initialImg);
 
+          if (prod.variants && prod.variants.length > 0) {
+            setSelectedVariant(prod.variants[0].name);
+          }
+
           // Related products in same category
           const related = allProds
             .filter((p) => p.id !== prod.id && (p.category === prod.category || !p.category))
@@ -126,15 +131,24 @@ export default function ProductDetailPage() {
     }
   };
 
+  const activePrice = useMemo(() => {
+    if (!product) return 0;
+    if (selectedVariant && product.variants && product.variants.length > 0) {
+      const match = product.variants.find((v) => v.name === selectedVariant);
+      if (match) return match.price;
+    }
+    return product.price;
+  }, [product, selectedVariant]);
+
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!product || product.is_sold_out) return;
     saveToLocalCart(product.id, quantity);
     setAddedToast(true);
     setTimeout(() => setAddedToast(false), 2500);
   };
 
   const handleBuyNow = () => {
-    if (!product) return;
+    if (!product || product.is_sold_out) return;
     saveToLocalCart(product.id, quantity);
     router.push(`/store/${slug}/checkout`);
   };
@@ -330,12 +344,19 @@ export default function ProductDetailPage() {
                   {product.category || "Specialty"}
                 </span>
                 <span className="text-zinc-300">•</span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  {product.stock_quantity !== undefined && product.stock_quantity > 0
-                    ? `${product.stock_quantity <= 5 ? `Only ${product.stock_quantity} left in stock` : "In Stock"}`
-                    : "Made to Order"}
-                </span>
+                {product.is_sold_out ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                    Sold Out Today
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {product.stock_quantity !== undefined && product.stock_quantity > 0
+                      ? `${product.stock_quantity <= 5 ? `Only ${product.stock_quantity} left in stock` : "In Stock"}`
+                      : "Made to Order"}
+                  </span>
+                )}
               </div>
 
               <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-zinc-950 ${
@@ -346,11 +367,47 @@ export default function ProductDetailPage() {
 
               <div className="mt-4 flex items-baseline gap-3">
                 <span className="text-3xl font-extrabold text-zinc-950">
-                  {formatINR(product.price)}
+                  {formatINR(activePrice)}
                 </span>
-                <span className="text-xs text-zinc-500">Taxes included • Pre-order recommended</span>
+                {selectedVariant && (
+                  <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+                    {selectedVariant}
+                  </span>
+                )}
+                <span className="text-xs text-zinc-500">Taxes included • Freshly prepared</span>
               </div>
             </div>
+
+            {/* Product Sizes / Variants Selection */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-2 pt-2 border-t border-zinc-100">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 block">
+                  Select Size / Portion:
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map((v) => {
+                    const isSel = (selectedVariant || product.variants![0].name) === v.name;
+                    return (
+                      <button
+                        key={v.id || v.name}
+                        type="button"
+                        onClick={() => setSelectedVariant(v.name)}
+                        className={`py-2 px-3.5 rounded-xl border text-xs font-bold transition-all ${
+                          isSel
+                            ? "bg-purple-600 text-white border-purple-600 shadow-2xs"
+                            : "bg-white text-zinc-800 border-zinc-200 hover:border-zinc-300"
+                        }`}
+                      >
+                        <span>{v.name}</span>
+                        <span className={`ml-1.5 font-normal text-[11px] ${isSel ? "text-purple-100" : "text-zinc-500"}`}>
+                          ({formatINR(v.price)})
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <div className="border-t border-b border-zinc-100 py-4 space-y-2">
@@ -364,61 +421,72 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Quantity Selector */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 block">
-                Quantity
-              </label>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center bg-zinc-100 rounded-xl p-1 border border-zinc-200">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="p-2 hover:bg-white rounded-lg text-zinc-700 transition-colors"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="px-4 text-sm font-bold text-zinc-900">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="p-2 hover:bg-white rounded-lg text-zinc-700 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
+            {!product.is_sold_out && (
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 block">
+                  Quantity
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center bg-zinc-100 rounded-xl p-1 border border-zinc-200">
+                    <button
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      className="p-2 hover:bg-white rounded-lg text-zinc-700 transition-colors"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="px-4 text-sm font-bold text-zinc-900">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity((q) => q + 1)}
+                      className="p-2 hover:bg-white rounded-lg text-zinc-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                <div className="text-xs text-zinc-500">
-                  Total: <span className="font-bold text-zinc-900 text-sm">{formatINR(product.price * quantity)}</span>
+                  <div className="text-xs text-zinc-500">
+                    Total: <span className="font-bold text-zinc-900 text-sm">{formatINR(activePrice * quantity)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Action Buttons: Add to Cart & Buy Now */}
             <div className="space-y-2.5 pt-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* 1. Add to Cart */}
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  className={`w-full py-3.5 px-4 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 border-2 transition-all shadow-xs ${
-                    addedToast
-                      ? "bg-emerald-50 text-emerald-800 border-emerald-400"
-                      : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-50"
-                  }`}
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>{addedToast ? "Added to Bag ✓" : "Add to Bag"}</span>
-                </button>
+              {product.is_sold_out ? (
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-center space-y-1">
+                  <span className="font-bold text-sm block">Sold Out for Today</span>
+                  <p className="text-xs text-rose-700">
+                    This daily bake is completely sold out. Message the maker on WhatsApp to pre-order for tomorrow!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* 1. Add to Cart */}
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className={`w-full py-3.5 px-4 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 border-2 transition-all shadow-xs ${
+                      addedToast
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-400"
+                        : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-50"
+                    }`}
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>{addedToast ? "Added to Bag ✓" : "Add to Bag"}</span>
+                  </button>
 
-                {/* 2. Buy Now */}
-                <button
-                  type="button"
-                  onClick={handleBuyNow}
-                  className="w-full py-3.5 px-4 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-all hover:opacity-90 active:scale-[0.99]"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>Buy Now &rarr;</span>
-                </button>
-              </div>
+                  {/* 2. Buy Now */}
+                  <button
+                    type="button"
+                    onClick={handleBuyNow}
+                    className="w-full py-3.5 px-4 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-all hover:opacity-90 active:scale-[0.99]"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    <Zap className="w-4 h-4" />
+                    <span>Buy Now &rarr;</span>
+                  </button>
+                </div>
+              )}
 
               {/* Direct WhatsApp Inquiry */}
               {store.whatsapp_number && (

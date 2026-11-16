@@ -1117,41 +1117,67 @@ export default function StoreAppearanceBuilderPage() {
         {/* ============================================================== */}
         <main className="flex-1 bg-zinc-200/80 p-4 md:p-6 overflow-y-auto flex flex-col items-center justify-start">
           {/* Viewport Frame */}
-          <div
-            className={`transition-all duration-300 bg-white shadow-xl rounded-2xl overflow-hidden border border-zinc-300 flex flex-col ${
-              viewport === "desktop"
-                ? "w-full max-w-5xl min-h-[800px]"
-                : viewport === "tablet"
-                ? "w-[768px] min-h-[850px]"
-                : "w-[375px] min-h-[750px]"
-            }`}
-          >
-            {/* Mock browser address bar */}
-            <div className="h-8 bg-zinc-100 border-b border-zinc-200 px-3 flex items-center gap-2 select-none shrink-0">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+          {viewport === "mobile" ? (
+            /* REALISTIC SMARTPHONE CHASSIS (iPhone Simulator) */
+            <div className="relative w-[390px] h-[820px] bg-zinc-900 rounded-[50px] p-3 shadow-2xl border-4 border-zinc-700/80 ring-1 ring-zinc-800 flex flex-col justify-between shrink-0 my-auto">
+              {/* Dynamic Island / Speaker Notch */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-28 h-6 bg-black rounded-full flex items-center justify-between px-2.5 shadow-xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-900 border border-zinc-800" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
               </div>
-              <div className="flex-1 flex justify-center">
-                <div className="bg-white px-4 py-0.5 rounded-md text-[10px] text-zinc-500 border border-zinc-200 flex items-center gap-1 font-mono">
-                  <span className="text-zinc-400">https://</span>
-                  <span>sellnest.com/store/</span>
-                  <span className="font-semibold text-zinc-800">{storeSlug || "mystore"}</span>
+
+              {/* Inner Screen */}
+              <div className="w-full h-full bg-white rounded-[38px] overflow-hidden flex flex-col relative pt-7">
+                <div className="flex-1 overflow-y-auto">
+                  <StorefrontView
+                    store={livePreviewStore}
+                    products={sampleProducts}
+                    isPreview={true}
+                    viewport="mobile"
+                  />
+                </div>
+                {/* Home Bar Indicator */}
+                <div className="h-4 bg-white/90 backdrop-blur-xs flex items-center justify-center shrink-0">
+                  <div className="w-28 h-1 bg-zinc-400/80 rounded-full" />
                 </div>
               </div>
             </div>
+          ) : (
+            /* DESKTOP / TABLET BROWSER FRAME */
+            <div
+              className={`transition-all duration-300 bg-white shadow-xl rounded-2xl overflow-hidden border border-zinc-300 flex flex-col ${
+                viewport === "desktop"
+                  ? "w-full max-w-5xl min-h-[800px]"
+                  : "w-[768px] min-h-[850px]"
+              }`}
+            >
+              {/* Mock browser address bar */}
+              <div className="h-8 bg-zinc-100 border-b border-zinc-200 px-3 flex items-center gap-2 select-none shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="bg-white px-4 py-0.5 rounded-md text-[10px] text-zinc-500 border border-zinc-200 flex items-center gap-1 font-mono">
+                    <span className="text-zinc-400">https://</span>
+                    <span>sellnest.com/store/</span>
+                    <span className="font-semibold text-zinc-800">{storeSlug || "mystore"}</span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Live Interactive Storefront Component */}
-            <div className="flex-1 overflow-y-auto">
-              <StorefrontView
-                store={livePreviewStore}
-                products={sampleProducts}
-                isPreview={true}
-                viewport={viewport}
-              />
+              {/* Live Interactive Storefront Component */}
+              <div className="flex-1 overflow-y-auto">
+                <StorefrontView
+                  store={livePreviewStore}
+                  products={sampleProducts}
+                  isPreview={true}
+                  viewport={viewport}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
 

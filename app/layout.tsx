@@ -16,6 +16,13 @@ export const metadata: Metadata = {
     "SellNest",
   ],
   authors: [{ name: "SellNest" }],
+  manifest: "/manifest.webmanifest",
+  themeColor: "#7E22CE",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SellNest",
+  },
   openGraph: {
     title: "SellNest — Your business. Your own little corner of the internet.",
     description:

@@ -18,6 +18,8 @@ import {
   MapPin,
   XCircle,
   Store as StoreIcon,
+  Gift,
+  Heart,
 } from "lucide-react";
 import { Order, Store, OrderStatus } from "@/lib/types";
 import { formatINR, getWhatsAppUrl } from "@/lib/utils";
@@ -332,6 +334,40 @@ function OrderTrackingContent() {
                 <span className="text-purple-700">{formatINR(trackedOrder.total_amount)}</span>
               </div>
             </div>
+
+            {/* SCHEDULED DELIVERY & CUSTOM MESSAGE */}
+            {(trackedOrder.delivery_date || trackedOrder.custom_message) && (
+              <div className="border-t border-zinc-100 pt-4 space-y-2 text-xs">
+                {trackedOrder.delivery_date && (
+                  <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-purple-700" />
+                      <div>
+                        <span className="font-bold text-purple-950 block">Delivery Scheduled:</span>
+                        <span className="text-[11px] text-purple-700">
+                          {trackedOrder.delivery_date} {trackedOrder.delivery_slot ? `• ${trackedOrder.delivery_slot}` : ""}
+                        </span>
+                      </div>
+                    </div>
+                    {trackedOrder.dietary_preference && trackedOrder.dietary_preference !== "Standard" && (
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+                        {trackedOrder.dietary_preference}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {trackedOrder.custom_message && (
+                  <div className="p-3 bg-pink-50/70 rounded-xl border border-pink-100 flex items-start gap-2">
+                    <Gift className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-pink-950 block">Message on Cake / Greeting:</span>
+                      <span className="text-[11px] text-pink-800 italic">&ldquo;{trackedOrder.custom_message}&rdquo;</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* DELIVERY ADDRESS */}
             <div className="border-t border-zinc-100 pt-4 flex items-start gap-2.5 text-xs text-zinc-600">

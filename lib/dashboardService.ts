@@ -726,6 +726,8 @@ export interface CreateUpgradeRequestInput {
   seller_name: string;
   seller_email: string;
   target_plan_id: PlanId;
+  amount?: number;
+  billing_cycle?: "monthly" | "yearly";
   payment_method: string;
   transaction_reference: string;
   payment_date: string;
@@ -793,7 +795,7 @@ export async function createUpgradeRequest(
     seller_email: (seller_email || "").trim(),
     current_plan_id: currentSub.plan_id,
     target_plan_id,
-    amount: targetPlan.priceMonthly,
+    amount: input.amount || (input.billing_cycle === "yearly" ? targetPlan.priceYearly : targetPlan.priceMonthly),
     currency: "INR",
     payment_method,
     transaction_reference: cleanRef,
@@ -1260,6 +1262,12 @@ export async function createOrder(
     city?: string;
     state?: string;
     pincode?: string;
+    delivery_date?: string;
+    delivery_slot?: string;
+    custom_message?: string;
+    dietary_preference?: string;
+    discount_amount?: number;
+    promo_code?: string;
     subtotal_amount?: number;
     delivery_fee?: number;
     total_amount: number;
@@ -1290,6 +1298,12 @@ export async function createOrder(
       city: orderData.city,
       state: orderData.state,
       pincode: orderData.pincode,
+      delivery_date: orderData.delivery_date,
+      delivery_slot: orderData.delivery_slot,
+      custom_message: orderData.custom_message,
+      dietary_preference: orderData.dietary_preference,
+      discount_amount: orderData.discount_amount,
+      promo_code: orderData.promo_code,
       subtotal_amount: orderData.subtotal_amount ?? orderData.total_amount,
       delivery_fee: orderData.delivery_fee ?? 0,
       total_amount: orderData.total_amount,
@@ -1344,6 +1358,12 @@ export async function createOrder(
       city: orderData.city,
       state: orderData.state,
       pincode: orderData.pincode,
+      delivery_date: orderData.delivery_date,
+      delivery_slot: orderData.delivery_slot,
+      custom_message: orderData.custom_message,
+      dietary_preference: orderData.dietary_preference,
+      discount_amount: orderData.discount_amount,
+      promo_code: orderData.promo_code,
       subtotal_amount: orderData.subtotal_amount ?? orderData.total_amount,
       delivery_fee: orderData.delivery_fee ?? 0,
       total_amount: orderData.total_amount,

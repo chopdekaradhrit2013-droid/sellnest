@@ -65,6 +65,13 @@ export interface Store {
   updated_at: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string; // e.g. "500g", "1kg", "Box of 6"
+  price: number;
+  in_stock?: boolean;
+}
+
 export interface Product {
   id: string;
   store_id: string;
@@ -78,6 +85,8 @@ export interface Product {
   is_active: boolean;
   is_eggless?: boolean;
   prep_time?: string;
+  is_sold_out?: boolean;
+  variants?: ProductVariant[];
   created_at: string;
   updated_at: string;
 }
@@ -112,6 +121,12 @@ export interface Order {
   city?: string;
   state?: string;
   pincode?: string;
+  delivery_date?: string;
+  delivery_slot?: string;
+  custom_message?: string;
+  dietary_preference?: string;
+  discount_amount?: number;
+  promo_code?: string;
   subtotal_amount?: number;
   delivery_fee?: number;
   total_amount: number;
@@ -126,6 +141,8 @@ export interface Order {
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedVariant?: string;
+  variantPrice?: number;
 }
 
 export interface CustomerCheckoutData {
@@ -136,6 +153,12 @@ export interface CustomerCheckoutData {
   city: string;
   state: string;
   pincode: string;
+  delivery_date?: string;
+  delivery_slot?: string;
+  custom_message?: string;
+  dietary_preference?: string;
+  discount_amount?: number;
+  promo_code?: string;
   notes?: string;
 }
 

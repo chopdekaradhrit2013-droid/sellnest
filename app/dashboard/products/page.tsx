@@ -61,6 +61,8 @@ export default function ProductsPage() {
   const [stockQuantity, setStockQuantity] = useState("10");
   const [isActive, setIsActive] = useState(true);
   const [isEggless, setIsEggless] = useState(false);
+  const [isSoldOut, setIsSoldOut] = useState(false);
+  const [variants, setVariants] = useState<Array<{ id: string; name: string; price: number }>>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
@@ -100,6 +102,8 @@ export default function ProductsPage() {
     setStockQuantity("12");
     setIsActive(true);
     setIsEggless(false);
+    setIsSoldOut(false);
+    setVariants([]);
     setIsModalOpen(true);
     setActionError(null);
   };
@@ -115,8 +119,56 @@ export default function ProductsPage() {
     setStockQuantity(prod.stock_quantity.toString());
     setIsActive(prod.is_active);
     setIsEggless(prod.is_eggless || false);
+    setIsSoldOut(prod.is_sold_out || false);
+    setVariants(prod.variants || []);
     setIsModalOpen(true);
     setActionError(null);
+  };
+
+  // Quick 1-click toggle for Sold Out Today
+  const handleToggleSoldOut = async (prod: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextState = !prod.is_sold_out;
+    setProducts((prev) =>
+      prev.map((p) => (p.id === prod.id ? { ...p, is_sold_out: nextState } : p))
+    );
+    try {
+      await updateProduct(prod.id, { is_sold_out: nextState });
+      setActionSuccess(
+        nextState
+          ? `Marked "${prod.name}" as Sold Out Today.`
+          : `Marked "${prod.name}" as Available In Stock.`
+      );
+      setTimeout(() => setActionSuccess(null), 3000);
+    } catch (err) {
+      console.error("Toggle sold out error:", err);
+      await loadProducts();
+    }
+  };
+
+  // Add / Remove Variant Row in Modal
+  const handleAddVariantRow = () => {
+    const defaultPrice = parseFloat(price) || 200;
+    setVariants((prev) => [
+      ...prev,
+      {
+        id: "var-" + Date.now(),
+        name: prev.length === 0 ? "500g" : prev.length === 1 ? "1kg" : "Large Box",
+        price: defaultPrice,
+      },
+    ]);
+  };
+
+  const handleRemoveVariantRow = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateVariant = (index: number, field: "name" | "price", val: any) => {
+    setVariants((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: val };
+      return copy;
+    });
   };
 
   // Handle Form Submit (Add / Edit)
@@ -140,6 +192,10 @@ export default function ProductsPage() {
     setSubmitting(true);
     setActionError(null);
 
+    const validVariants = variants
+      .filter((v) => v.name.trim() && !isNaN(v.price) && v.price > 0)
+      .map((v) => ({ ...v, name: v.name.trim() }));
+
     try {
       if (editingProduct) {
         // Update product
@@ -152,6 +208,8 @@ export default function ProductsPage() {
           stock_quantity: isNaN(numStock) ? 0 : numStock,
           is_active: isActive,
           is_eggless: isEggless,
+          is_sold_out: isSoldOut,
+          variants: validVariants.length > 0 ? validVariants : undefined,
         });
 
         if (error) {
@@ -172,9 +230,11 @@ export default function ProductsPage() {
           image_url:
             imageUrl.trim() ||
             "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80",
-          stock_quantity: isNaN(numStock) ? 0 : numStock,
+          stock_quantity: isNaN(numStock) ? 10 : numStock,
           is_active: isActive,
           is_eggless: isEggless,
+          is_sold_out: isSoldOut,
+          variants: validVariants.length > 0 ? validVariants : undefined,
         });
 
         if (limitReached) {
@@ -422,28 +482,39 @@ export default function ProductsPage() {
 
                   {/* Status badges */}
                   <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
-                    {prod.is_eggless && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white px-2 py-0.5 rounded-md shadow-xs">
-                        Eggless
+                    {prod.is_sold_out ? (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-md shadow-xs animate-pulse">
+                        Sold Out Today
                       </span>
-                    )}
-                    {prod.stock_quantity <= 0 ? (
+                    ) : prod.stock_quantity <= 0 ? (
                       <span className="text-[10px] font-bold uppercase tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-md shadow-xs">
-                        Sold Out
+                        Out of Stock
                       </span>
                     ) : prod.stock_quantity <= 5 ? (
                       <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-white px-2 py-0.5 rounded-md shadow-xs">
                         Low Stock ({prod.stock_quantity})
                       </span>
                     ) : null}
+                    {prod.is_eggless && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white px-2 py-0.5 rounded-md shadow-xs">
+                        Eggless
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Details */}
                 <div className="p-4 sm:p-5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/60 inline-block mb-1.5">
-                    {prod.category}
-                  </span>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/60 inline-block">
+                      {prod.category}
+                    </span>
+                    {prod.variants && prod.variants.length > 0 && (
+                      <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
+                        {prod.variants.length} Sizes
+                      </span>
+                    )}
+                  </div>
                   <h4 className="text-sm font-bold text-charcoal-900 group-hover:text-purple-900 transition-colors">
                     {prod.name}
                   </h4>
@@ -463,6 +534,21 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
+                  {/* Quick 1-click Sold Out Today Switch */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleSoldOut(prod, e)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1 shadow-2xs ${
+                      prod.is_sold_out
+                        ? "bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100"
+                        : "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
+                    }`}
+                    title={prod.is_sold_out ? "Click to mark Available" : "Click to mark Sold Out Today"}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${prod.is_sold_out ? "bg-rose-500" : "bg-emerald-500"}`} />
+                    <span className="hidden sm:inline">{prod.is_sold_out ? "Sold Out" : "In Stock"}</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(prod)}
@@ -662,26 +748,93 @@ export default function ProductsPage() {
                 </div>
               </div>
 
+              {/* Product Sizes & Variants Builder */}
+              <div className="pt-2 border-t border-stone-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="font-semibold text-charcoal-800 text-xs block">
+                      Product Sizes / Portions (Optional)
+                    </label>
+                    <span className="text-[10px] text-stone-400">
+                      e.g. 500g, 1kg, Box of 6 with custom prices
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddVariantRow}
+                    className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 font-bold text-xs flex items-center gap-1 border border-purple-200 transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add Size</span>
+                  </button>
+                </div>
+
+                {variants.length > 0 && (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {variants.map((v, idx) => (
+                      <div key={v.id || idx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. 500g / 1kg"
+                          value={v.name}
+                          onChange={(e) => handleUpdateVariant(idx, "name", e.target.value)}
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-stone-300 text-xs focus:outline-none focus:border-purple-600"
+                        />
+                        <div className="w-24 relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">₹</span>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="Price"
+                            value={v.price}
+                            onChange={(e) => handleUpdateVariant(idx, "price", parseFloat(e.target.value) || 0)}
+                            className="w-full pl-6 pr-2 py-1.5 rounded-lg border border-stone-300 text-xs font-bold focus:outline-none focus:border-purple-600"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVariantRow(idx)}
+                          className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Remove size"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Toggles */}
-              <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="pt-2 border-t border-stone-100 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl border border-stone-200 hover:bg-stone-50">
                   <input
                     type="checkbox"
                     checked={isEggless}
                     onChange={(e) => setIsEggless(e.target.checked)}
                     className="w-4 h-4 rounded text-purple-600 border-stone-300"
                   />
-                  <span className="font-semibold text-charcoal-800">100% Eggless Badge</span>
+                  <span className="font-semibold text-charcoal-800 text-[11px]">Eggless</span>
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-50">
+                  <input
+                    type="checkbox"
+                    checked={isSoldOut}
+                    onChange={(e) => setIsSoldOut(e.target.checked)}
+                    className="w-4 h-4 rounded text-rose-600 border-rose-300"
+                  />
+                  <span className="font-bold text-rose-700 text-[11px]">Sold Out Today</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl border border-stone-200 hover:bg-stone-50">
                   <input
                     type="checkbox"
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
                     className="w-4 h-4 rounded text-purple-600 border-stone-300"
                   />
-                  <span className="font-semibold text-charcoal-800">Active in Storefront</span>
+                  <span className="font-semibold text-charcoal-800 text-[11px]">Published</span>
                 </label>
               </div>
 

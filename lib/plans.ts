@@ -22,6 +22,7 @@ export interface PlanConfig {
   badge?: string;
   tagline: string;
   priceMonthly: number;
+  priceYearly: number;
   currency: string;
   limits: PlanLimits;
   features: string[];
@@ -88,6 +89,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     badge: "Forever Free",
     tagline: "Perfect for budding bakers, hobbyists & new makers starting out.",
     priceMonthly: 0,
+    priceYearly: 0,
     currency: "INR",
     limits: {
       maxStores: 1,
@@ -119,6 +121,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     popular: true,
     tagline: "Ideal for growing independent creators & Instagram sellers scaling orders.",
     priceMonthly: 99,
+    priceYearly: 999,
     currency: "INR",
     limits: {
       maxStores: 1,
@@ -150,6 +153,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     badge: "Full Power",
     tagline: "For busy artisanal studios, high-volume bakeries and established brands.",
     priceMonthly: 199,
+    priceYearly: 1999,
     currency: "INR",
     limits: {
       maxStores: 1,

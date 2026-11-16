@@ -17,6 +17,10 @@ import {
   ExternalLink,
   Copy,
   Check,
+  Gift,
+  Clock,
+  Heart,
+  Tag,
 } from "lucide-react";
 import { Order, Store } from "@/lib/types";
 import { formatINR, getWhatsAppUrl, copyToClipboard } from "@/lib/utils";
@@ -108,18 +112,34 @@ export default function OrderConfirmationPage() {
     .filter(Boolean)
     .join(", ");
 
+  const waSchedule = order.delivery_date
+    ? `\n📅 *Delivery Date & Slot:* ${order.delivery_date}${order.delivery_slot ? ` (${order.delivery_slot})` : ""}`
+    : "";
+
+  const waCustomNote = order.custom_message
+    ? `\n✍️ *Cake / Box Note:* "${order.custom_message}"`
+    : "";
+
+  const waDiet = order.dietary_preference && order.dietary_preference !== "Standard"
+    ? `\n🌱 *Dietary Preference:* ${order.dietary_preference}`
+    : "";
+
+  const waDiscount = order.discount_amount && order.discount_amount > 0
+    ? `\n🎟️ *Coupon Applied:* ${order.promo_code || "DISCOUNT"} (-₹${order.discount_amount})`
+    : "";
+
   const waMessage = `👋 Hello ${store.name}!
 I have placed an order on your SellNest storefront.
 
 🧾 *Order Number:* ${orderCode}
 👤 *Customer:* ${order.customer_name}
 📱 *Phone:* ${order.customer_phone || "Not provided"}
-📍 *Delivery Address:* ${fullAddress}
+📍 *Delivery Address:* ${fullAddress}${waSchedule}${waCustomNote}${waDiet}
 
 📋 *Items Ordered:*
 ${itemsText}
 
-💰 *Subtotal:* ₹${order.subtotal_amount || order.total_amount}
+💰 *Subtotal:* ₹${order.subtotal_amount || order.total_amount}${waDiscount}
 🚚 *Delivery:* ₹${order.delivery_fee || 0}
 💵 *Total Amount:* ₹${order.total_amount}${order.notes ? `\n📝 *Notes:* ${order.notes}` : ""}
 
@@ -223,6 +243,14 @@ Please confirm my order and share payment instructions. Thank you!`;
                 {formatINR(order.subtotal_amount || order.total_amount)}
               </span>
             </div>
+
+            {order.discount_amount && order.discount_amount > 0 && (
+              <div className="flex items-center justify-between text-emerald-700 font-semibold">
+                <span>Coupon Discount ({order.promo_code || "COUPON"})</span>
+                <span>-{formatINR(order.discount_amount)}</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <span>Delivery Fee</span>
               <span className="font-medium text-zinc-900">
@@ -236,7 +264,36 @@ Please confirm my order and share payment instructions. Thank you!`;
           </div>
 
           {/* Delivery & Customer Info */}
-          <div className="border-t border-zinc-100 pt-4 space-y-2 text-xs text-zinc-600">
+          <div className="border-t border-zinc-100 pt-4 space-y-2.5 text-xs text-zinc-600">
+            {order.delivery_date && (
+              <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-700" />
+                  <div>
+                    <span className="font-bold text-purple-950 block">Scheduled Delivery:</span>
+                    <span className="text-[11px] text-purple-700">
+                      {order.delivery_date} {order.delivery_slot ? `• ${order.delivery_slot}` : ""}
+                    </span>
+                  </div>
+                </div>
+                {order.dietary_preference && order.dietary_preference !== "Standard" && (
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200">
+                    {order.dietary_preference}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {order.custom_message && (
+              <div className="p-3 bg-pink-50/60 rounded-xl border border-pink-100 flex items-start gap-2">
+                <Gift className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-pink-950 block">Message on Cake / Greeting:</span>
+                  <span className="text-[11px] text-pink-800 italic">&ldquo;{order.custom_message}&rdquo;</span>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-start gap-2">
               <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0 mt-0.5" />
               <div>

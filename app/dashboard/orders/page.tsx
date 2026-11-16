@@ -20,6 +20,11 @@ import {
   Calendar,
   AlertCircle,
   RefreshCw,
+  Printer,
+  FileText,
+  Gift,
+  Heart,
+  QrCode,
 } from "lucide-react";
 import { useDashboard } from "@/lib/DashboardContext";
 import { getStoreOrders, updateOrderStatus, createOrder } from "@/lib/dashboardService";
@@ -36,6 +41,7 @@ export default function OrdersPage() {
 
   // Selected Order for Detail Modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
 
   // Test Order Modal
   const [isTestOrderModalOpen, setIsTestOrderModalOpen] = useState(false);
@@ -401,16 +407,56 @@ export default function OrdersPage() {
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setSelectedOrder(ord)}
-                      className="px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors flex items-center gap-1"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>View Details</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setReceiptOrder(ord)}
+                        className="px-2.5 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors flex items-center gap-1 shadow-2xs"
+                        title="Print / Share Order Bill"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-stone-500" />
+                        <span className="hidden sm:inline">Receipt</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOrder(ord)}
+                        className="px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Details</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {/* Baker & Maker Delivery Schedule & Cake Note Banner */}
+                {(ord.delivery_date || ord.custom_message || (ord.dietary_preference && ord.dietary_preference !== "Standard")) && (
+                  <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-stone-100 text-xs">
+                    {ord.delivery_date && (
+                      <span className="inline-flex items-center gap-1.5 bg-purple-50 text-purple-800 border border-purple-200 px-2.5 py-1 rounded-lg font-medium text-[11px]">
+                        <Calendar className="w-3 h-3 text-purple-600 shrink-0" />
+                        <span>Schedule: <strong>{ord.delivery_date}</strong> {ord.delivery_slot ? `• ${ord.delivery_slot}` : ""}</span>
+                      </span>
+                    )}
+                    {ord.custom_message && (
+                      <span className="inline-flex items-center gap-1.5 bg-pink-50 text-pink-800 border border-pink-200 px-2.5 py-1 rounded-lg font-medium text-[11px]">
+                        <Gift className="w-3 h-3 text-pink-600 shrink-0" />
+                        <span>Cake Note: <em>&ldquo;{ord.custom_message}&rdquo;</em></span>
+                      </span>
+                    )}
+                    {ord.dietary_preference && ord.dietary_preference !== "Standard" && (
+                      <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold text-[10px]">
+                        {ord.dietary_preference}
+                      </span>
+                    )}
+                    {ord.discount_amount && ord.discount_amount > 0 && (
+                      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-md font-semibold text-[10px]">
+                        Coupon: {ord.promo_code || "DISCOUNT"} (-{formatINR(ord.discount_amount)})
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Notes if any */}
                 {ord.notes && (
@@ -493,6 +539,41 @@ export default function OrdersPage() {
                     .join(", ")}
                 </span>
               </p>
+
+              {/* Delivery Schedule & Cake Customization Cards */}
+              {(selectedOrder.delivery_date || selectedOrder.custom_message) && (
+                <div className="pt-2 space-y-2">
+                  {selectedOrder.delivery_date && (
+                    <div className="p-2.5 bg-purple-50 rounded-xl border border-purple-200 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-purple-700" />
+                        <div>
+                          <span className="font-bold text-purple-950 block">Delivery Scheduled:</span>
+                          <span className="text-[11px] text-purple-700">
+                            {selectedOrder.delivery_date} {selectedOrder.delivery_slot ? `• ${selectedOrder.delivery_slot}` : ""}
+                          </span>
+                        </div>
+                      </div>
+                      {selectedOrder.dietary_preference && selectedOrder.dietary_preference !== "Standard" && (
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+                          {selectedOrder.dietary_preference}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedOrder.custom_message && (
+                    <div className="p-2.5 bg-pink-50 rounded-xl border border-pink-200 flex items-start gap-2 text-xs">
+                      <Gift className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold text-pink-950 block">Message on Cake / Greeting:</span>
+                        <span className="text-[11px] text-pink-800 italic">&ldquo;{selectedOrder.custom_message}&rdquo;</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {selectedOrder.notes && (
                 <p className="p-2 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 mt-1">
                   <strong>Notes:</strong> {selectedOrder.notes}
@@ -528,21 +609,207 @@ export default function OrdersPage() {
               </div>
             </div>
 
-            {/* Direct WhatsApp Contact Button */}
-            {selectedOrder.customer_phone && (
-              <a
-                href={getWhatsAppUrl(
-                  selectedOrder.customer_phone,
-                  `Hello ${selectedOrder.customer_name}! Your order ${selectedOrder.order_code || selectedOrder.order_number} is now ${selectedOrder.status}.`
-                )}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs"
+            {/* Actions: Receipt and WhatsApp */}
+            <div className="space-y-2 pt-2 border-t border-stone-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setReceiptOrder(selectedOrder);
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-charcoal-800 font-semibold text-xs bg-stone-100 hover:bg-stone-200 transition-colors shadow-2xs"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>Message Customer on WhatsApp</span>
-              </a>
+                <FileText className="w-4 h-4 text-stone-600" />
+                <span>View &amp; Print Order Receipt / Bill</span>
+              </button>
+
+              {selectedOrder.customer_phone && (
+                <a
+                  href={getWhatsAppUrl(
+                    selectedOrder.customer_phone,
+                    `Hello ${selectedOrder.customer_name}! Your order ${selectedOrder.order_code || selectedOrder.order_number} is now ${selectedOrder.status}.`
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Message Customer on WhatsApp</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PRINTABLE RECEIPT / BILL GENERATOR MODAL */}
+      {receiptOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-stone-200 space-y-6 animate-in fade-in zoom-in-95 print:p-0 print:border-none print:shadow-none">
+            {/* Header / Brand */}
+            <div className="flex items-start justify-between border-b-2 border-dashed border-stone-200 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+                  Retail Order Receipt
+                </span>
+                <h3 className="text-xl font-extrabold text-charcoal-950 mt-1">
+                  {store?.name || "SellNest Store"}
+                </h3>
+                <p className="text-[11px] text-stone-500">
+                  {store?.email || "Artisanal Baker & Maker"} &bull; WhatsApp: {store?.whatsapp_number || "Active"}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setReceiptOrder(null)}
+                className="p-1.5 rounded-full hover:bg-stone-100 text-stone-400 print:hidden"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Order Metadata */}
+            <div className="grid grid-cols-2 gap-3 text-xs bg-stone-50 p-3.5 rounded-2xl border border-stone-200/80">
+              <div>
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Order Code</span>
+                <span className="font-mono font-bold text-charcoal-900 text-sm">
+                  {receiptOrder.order_code || `SN-${receiptOrder.order_number}`}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Order Date</span>
+                <span className="font-semibold text-charcoal-800">
+                  {new Date(receiptOrder.created_at).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+              <div className="col-span-2 pt-1 border-t border-stone-200/50">
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Billed To</span>
+                <span className="font-bold text-charcoal-950 block">{receiptOrder.customer_name}</span>
+                {receiptOrder.customer_phone && (
+                  <span className="text-stone-500 block">Phone: {receiptOrder.customer_phone}</span>
+                )}
+                {receiptOrder.delivery_address && (
+                  <span className="text-stone-500 block">
+                    {[receiptOrder.delivery_address, receiptOrder.city, receiptOrder.state, receiptOrder.pincode]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Scheduled Delivery & Custom Note Highlight */}
+            {(receiptOrder.delivery_date || receiptOrder.custom_message) && (
+              <div className="space-y-2 text-xs">
+                {receiptOrder.delivery_date && (
+                  <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-between text-purple-950">
+                    <span className="font-bold">
+                      📅 Scheduled Delivery: {receiptOrder.delivery_date} {receiptOrder.delivery_slot ? `(${receiptOrder.delivery_slot})` : ""}
+                    </span>
+                    {receiptOrder.dietary_preference && (
+                      <span className="text-[10px] font-bold bg-white px-2 py-0.5 rounded border border-purple-200">
+                        {receiptOrder.dietary_preference}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {receiptOrder.custom_message && (
+                  <div className="p-2.5 rounded-xl bg-pink-50 border border-pink-200 text-pink-900 text-xs">
+                    <span className="font-bold">🎂 Cake / Box Inscription:</span> &ldquo;{receiptOrder.custom_message}&rdquo;
+                  </div>
+                )}
+              </div>
             )}
+
+            {/* Itemized Table */}
+            <div className="space-y-2 text-xs">
+              <div className="grid grid-cols-12 font-bold text-stone-400 uppercase tracking-wider text-[10px] border-b border-stone-200 pb-1.5">
+                <span className="col-span-7">Item Description</span>
+                <span className="col-span-2 text-center">Qty</span>
+                <span className="col-span-3 text-right">Amount</span>
+              </div>
+              <div className="divide-y divide-stone-100">
+                {(receiptOrder.items || []).map((it, idx) => (
+                  <div key={idx} className="grid grid-cols-12 py-2 text-charcoal-800">
+                    <span className="col-span-7 font-medium truncate">{it.product_name}</span>
+                    <span className="col-span-2 text-center text-stone-500">{it.quantity}</span>
+                    <span className="col-span-3 text-right font-bold text-charcoal-900">
+                      {formatINR(it.total_price || it.unit_price * it.quantity)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Totals */}
+              <div className="border-t border-stone-200 pt-3 space-y-1 text-xs">
+                <div className="flex justify-between text-stone-600">
+                  <span>Subtotal</span>
+                  <span className="font-semibold">{formatINR(receiptOrder.subtotal_amount || receiptOrder.total_amount)}</span>
+                </div>
+                {receiptOrder.discount_amount && receiptOrder.discount_amount > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-semibold">
+                    <span>Coupon Discount ({receiptOrder.promo_code || "COUPON"})</span>
+                    <span>-{formatINR(receiptOrder.discount_amount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-stone-600">
+                  <span>Delivery Charges</span>
+                  <span className="font-semibold">
+                    {receiptOrder.delivery_fee ? formatINR(receiptOrder.delivery_fee) : "FREE"}
+                  </span>
+                </div>
+                <div className="pt-2 border-t-2 border-charcoal-900 flex justify-between font-extrabold text-base text-charcoal-950">
+                  <span>Grand Total</span>
+                  <span className="text-purple-700">{formatINR(receiptOrder.total_amount)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* UPI QR & Payment Info */}
+            <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 flex items-center gap-4">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(
+                  `upi://pay?pa=thebutterroom@okhdfcbank&pn=${encodeURIComponent(store?.name || "SellNest Maker")}&am=${receiptOrder.total_amount}&cu=INR`
+                )}`}
+                alt="Store Payment QR"
+                className="w-16 h-16 rounded-lg bg-white border border-stone-200 p-1 shrink-0"
+              />
+              <div className="text-xs space-y-0.5">
+                <span className="font-bold text-charcoal-900 block">Instant UPI Payment</span>
+                <p className="text-[11px] text-stone-500">Scan via GPay, PhonePe, or Paytm to pay {formatINR(receiptOrder.total_amount)}.</p>
+                <span className="font-mono text-[10px] text-purple-700 font-bold block">Status: {receiptOrder.status.toUpperCase()}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons (Hidden on Print) */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-stone-100 print:hidden">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-charcoal-900 hover:bg-black text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print Bill / Save PDF</span>
+              </button>
+
+              {receiptOrder.customer_phone && (
+                <a
+                  href={getWhatsAppUrl(
+                    receiptOrder.customer_phone,
+                    `*Order Bill - ${store?.name}*\n🧾 Order Ref: ${receiptOrder.order_code || `SN-${receiptOrder.order_number}`}\n👤 Customer: ${receiptOrder.customer_name}\n💵 Total Amount: ₹${receiptOrder.total_amount}\n📅 Scheduled: ${receiptOrder.delivery_date || "Standard"}\n\nThank you for supporting our artisanal shop!`
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Send Bill on WhatsApp</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
       )}
