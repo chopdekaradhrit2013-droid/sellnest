@@ -33,6 +33,8 @@ export interface StoreCustomization {
   phone?: string;
   social_links?: StoreSocialLinks;
   is_published?: boolean;
+  selected_hero?: string;
+  installed_components?: string[];
 }
 
 export interface Store {
@@ -56,6 +58,8 @@ export interface Store {
   currency: string;
   is_published: boolean;
   plan_id?: "free" | "starter" | "pro";
+  selected_hero?: string;
+  installed_components?: string[];
   draft_settings?: StoreCustomization | null;
   created_at: string;
   updated_at: string;

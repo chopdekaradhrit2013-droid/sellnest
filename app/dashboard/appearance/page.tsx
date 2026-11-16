@@ -55,12 +55,15 @@ import {
 } from "@/lib/themes";
 import { validateSlug } from "@/lib/slugUtils";
 import StorefrontView from "@/components/storefront/StorefrontView";
+import ComponentLibrary21st from "@/components/dashboard/ComponentLibrary21st";
 
 export default function StoreAppearanceBuilderPage() {
   const { store, plan, refreshStore, loading: storeLoading } = useDashboard();
 
   // Active editor tab
-  const [activeTab, setActiveTab] = useState<"theme" | "branding" | "content" | "social">("theme");
+  const [activeTab, setActiveTab] = useState<
+    "theme" | "branding" | "content" | "social" | "components"
+  >("theme");
   const [themeUpgradeModal, setThemeUpgradeModal] = useState<{
     open: boolean;
     title?: string;
@@ -84,6 +87,8 @@ export default function StoreAppearanceBuilderPage() {
     facebook: "",
     website: "",
   });
+  const [selectedHero, setSelectedHero] = useState<string>("default");
+  const [installedComponents, setInstalledComponents] = useState<string[]>([]);
   const [isPublished, setIsPublished] = useState(true);
 
   // Slug validation status
@@ -120,6 +125,8 @@ export default function StoreAppearanceBuilderPage() {
       setAnnouncement(source.announcement || store.announcement || "");
       setWhatsappNumber(source.whatsapp_number || store.whatsapp_number || "");
       setSocialLinks(source.social_links || store.social_links || {});
+      setSelectedHero(source.selected_hero || store.selected_hero || "default");
+      setInstalledComponents(source.installed_components || store.installed_components || []);
       setIsPublished(store.is_published ?? true);
       setHasUnsavedChanges(false);
     }
@@ -193,6 +200,8 @@ export default function StoreAppearanceBuilderPage() {
       announcement,
       whatsapp_number: whatsappNumber,
       social_links: socialLinks,
+      selected_hero: selectedHero,
+      installed_components: installedComponents,
       currency: "INR",
       is_published: isPublished,
     };
@@ -210,6 +219,8 @@ export default function StoreAppearanceBuilderPage() {
     announcement,
     whatsappNumber,
     socialLinks,
+    selectedHero,
+    installedComponents,
     isPublished,
   ]);
 
@@ -227,6 +238,8 @@ export default function StoreAppearanceBuilderPage() {
     announcement,
     whatsapp_number: whatsappNumber,
     social_links: socialLinks,
+    selected_hero: selectedHero,
+    installed_components: installedComponents,
   };
 
   // 1. SAVE DRAFT
@@ -474,52 +487,68 @@ export default function StoreAppearanceBuilderPage() {
         {/* ============================================================== */}
         {/* LEFT PANEL: CUSTOMIZATION CONTROLS */}
         {/* ============================================================== */}
-        <aside className="w-full md:w-[380px] lg:w-[420px] bg-white border-r border-zinc-200 flex flex-col shrink-0 overflow-hidden shadow-xs">
+        <aside className="w-full md:w-[400px] lg:w-[480px] bg-white border-r border-zinc-200 flex flex-col shrink-0 overflow-hidden shadow-xs">
           {/* Sub-Navigation Tabs */}
-          <div className="grid grid-cols-4 border-b border-zinc-200 text-xs font-semibold text-zinc-500 bg-zinc-50/50">
+          <div className="grid grid-cols-5 border-b border-zinc-200 text-xs font-semibold text-zinc-500 bg-zinc-50/50">
             <button
               onClick={() => setActiveTab("theme")}
-              className={`py-3 px-2 flex flex-col items-center gap-1 border-b-2 transition-all ${
+              className={`py-3 px-1 flex flex-col items-center gap-1 border-b-2 transition-all ${
                 activeTab === "theme"
                   ? "border-purple-600 text-purple-600 bg-white"
                   : "border-transparent hover:text-zinc-800"
               }`}
             >
               <Layout className="w-4 h-4" />
-              <span>Theme</span>
+              <span className="text-[11px]">Theme</span>
             </button>
             <button
               onClick={() => setActiveTab("branding")}
-              className={`py-3 px-2 flex flex-col items-center gap-1 border-b-2 transition-all ${
+              className={`py-3 px-1 flex flex-col items-center gap-1 border-b-2 transition-all ${
                 activeTab === "branding"
                   ? "border-purple-600 text-purple-600 bg-white"
                   : "border-transparent hover:text-zinc-800"
               }`}
             >
               <Palette className="w-4 h-4" />
-              <span>Branding</span>
+              <span className="text-[11px]">Branding</span>
             </button>
             <button
               onClick={() => setActiveTab("content")}
-              className={`py-3 px-2 flex flex-col items-center gap-1 border-b-2 transition-all ${
+              className={`py-3 px-1 flex flex-col items-center gap-1 border-b-2 transition-all ${
                 activeTab === "content"
                   ? "border-purple-600 text-purple-600 bg-white"
                   : "border-transparent hover:text-zinc-800"
               }`}
             >
               <Sliders className="w-4 h-4" />
-              <span>Content</span>
+              <span className="text-[11px]">Content</span>
             </button>
             <button
               onClick={() => setActiveTab("social")}
-              className={`py-3 px-2 flex flex-col items-center gap-1 border-b-2 transition-all ${
+              className={`py-3 px-1 flex flex-col items-center gap-1 border-b-2 transition-all ${
                 activeTab === "social"
                   ? "border-purple-600 text-purple-600 bg-white"
                   : "border-transparent hover:text-zinc-800"
               }`}
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Social</span>
+              <span className="text-[11px]">Social</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("components")}
+              className={`py-3 px-1 flex flex-col items-center gap-1 border-b-2 transition-all relative ${
+                activeTab === "components"
+                  ? "border-purple-600 text-purple-600 bg-white"
+                  : "border-transparent hover:text-zinc-800"
+              }`}
+            >
+              <Sparkles className="w-4 h-4 text-purple-600" />
+              <div className="flex items-center gap-1">
+                <span className="text-[11px]">21st.dev</span>
+                <span className="px-1 py-0.2 rounded-full bg-purple-600 text-white text-[9px] font-bold">
+                  100+
+                </span>
+              </div>
             </button>
           </div>
 
@@ -1043,6 +1072,28 @@ export default function StoreAppearanceBuilderPage() {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* TAB 5: 21ST.DEV COMPONENTS CATALOG */}
+            {activeTab === "components" && (
+              <ComponentLibrary21st
+                selectedHero={selectedHero}
+                onSelectHero={(hId) => {
+                  setSelectedHero(hId);
+                  markDirty();
+                }}
+                installedComponents={installedComponents}
+                onToggleComponent={(cId) => {
+                  setInstalledComponents((prev) =>
+                    prev.includes(cId) ? prev.filter((id) => id !== cId) : [...prev, cId]
+                  );
+                  markDirty();
+                }}
+                onInstallPack={(packIds) => {
+                  setInstalledComponents((prev) => Array.from(new Set([...prev, ...packIds])));
+                  markDirty();
+                }}
+              />
             )}
           </div>
         </aside>

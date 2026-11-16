@@ -80,6 +80,7 @@ const config: Config = {
         "float": "float 6s ease-in-out infinite",
         "float-delayed": "float 6s ease-in-out 3s infinite",
         "pulse-subtle": "pulseSubtle 3s ease-in-out infinite",
+        "marquee": "marquee 25s linear infinite",
       },
       keyframes: {
         float: {
@@ -89,6 +90,10 @@ const config: Config = {
         pulseSubtle: {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.8" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
         },
       },
     },

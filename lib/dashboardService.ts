@@ -310,6 +310,8 @@ export async function publishStore(
     if (applyDraft.announcement !== undefined) updates.announcement = applyDraft.announcement;
     if (applyDraft.whatsapp_number !== undefined) updates.whatsapp_number = applyDraft.whatsapp_number;
     if (applyDraft.social_links !== undefined) updates.social_links = applyDraft.social_links;
+    if (applyDraft.selected_hero !== undefined) updates.selected_hero = applyDraft.selected_hero;
+    if (applyDraft.installed_components !== undefined) updates.installed_components = applyDraft.installed_components;
   }
 
   return updateStore(storeId, updates);

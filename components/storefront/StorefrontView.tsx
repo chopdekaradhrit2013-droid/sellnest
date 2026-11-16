@@ -32,6 +32,7 @@ import {
 import { Store, Product } from "@/lib/types";
 import { formatINR, getWhatsAppUrl } from "@/lib/utils";
 import { getThemeConfig, getFontFamilyClass } from "@/lib/themes";
+import Dynamic21stRenderer from "./Dynamic21stRenderer";
 
 interface StorefrontViewProps {
   store: Partial<Store>;
@@ -301,70 +302,95 @@ export default function StorefrontView({
         </div>
       </header>
 
-      {/* 3. HERO / BANNER SECTION */}
-      <section className={`relative overflow-hidden transition-all ${s.heroStyle}`}>
-        {store.banner_url && (
-          <div className="absolute inset-0 z-0">
-            <img
-              src={store.banner_url}
-              alt={store.name || "Banner"}
-              className="w-full h-full object-cover opacity-20 filter contrast-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/60 to-transparent" />
-          </div>
-        )}
+      {/* 3. HERO / BANNER SECTION (21st.dev Dynamic Hero or Standard Theme Hero) */}
+      {store.selected_hero && store.selected_hero !== "default" ? (
+        <Dynamic21stRenderer
+          heroId={store.selected_hero}
+          installedComponents={[]}
+          store={store}
+          products={products}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+          isPreview={isPreview}
+        />
+      ) : (
+        <section className={`relative overflow-hidden transition-all ${s.heroStyle}`}>
+          {store.banner_url && (
+            <div className="absolute inset-0 z-0">
+              <img
+                src={store.banner_url}
+                alt={store.name || "Banner"}
+                className="w-full h-full object-cover opacity-20 filter contrast-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/60 to-transparent" />
+            </div>
+          )}
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
-          <div className="max-w-2xl space-y-4">
-            {themeKey === "playful" && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-pink-100 text-pink-700 tracking-wide">
-                <span>✨ Made with love & joy</span>
-              </span>
-            )}
-            {themeKey === "boutique" && (
-              <span className="inline-block text-xs uppercase tracking-[0.25em] text-amber-800/80 font-medium font-sans">
-                Artisanal Collection
-              </span>
-            )}
-            {themeKey === "minimal" && (
-              <span className="inline-block text-[11px] uppercase tracking-widest text-zinc-400 font-medium">
-                Fresh & Small-Batch
-              </span>
-            )}
-            {themeKey === "modern" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                <Sparkles className="w-3.5 h-3.5" />
-                Handcrafted Daily
-              </span>
-            )}
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
+            <div className="max-w-2xl space-y-4">
+              {themeKey === "playful" && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-pink-100 text-pink-700 tracking-wide">
+                  <span>✨ Made with love & joy</span>
+                </span>
+              )}
+              {themeKey === "boutique" && (
+                <span className="inline-block text-xs uppercase tracking-[0.25em] text-amber-800/80 font-medium font-sans">
+                  Artisanal Collection
+                </span>
+              )}
+              {themeKey === "minimal" && (
+                <span className="inline-block text-[11px] uppercase tracking-widest text-zinc-400 font-medium">
+                  Fresh & Small-Batch
+                </span>
+              )}
+              {themeKey === "modern" && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Handcrafted Daily
+                </span>
+              )}
 
-            <h2
-              className={`text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-950 ${
-                themeKey === "boutique" ? "font-serif italic font-normal text-4xl sm:text-5xl md:text-6xl" : ""
-              }`}
-            >
-              {store.name || "Handmade with patience."}
-            </h2>
+              <h2
+                className={`text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-950 ${
+                  themeKey === "boutique" ? "font-serif italic font-normal text-4xl sm:text-5xl md:text-6xl" : ""
+                }`}
+              >
+                {store.name || "Handmade with patience."}
+              </h2>
 
-            <p className="text-zinc-600 text-sm sm:text-base leading-relaxed max-w-xl">
-              {store.description ||
-                "Small-batch artisanal creations made with pure ingredients, authentic passion and attention to every detail."}
-            </p>
+              <p className="text-zinc-600 text-sm sm:text-base leading-relaxed max-w-xl">
+                {store.description ||
+                  "Small-batch artisanal creations made with pure ingredients, authentic passion and attention to every detail."}
+              </p>
 
-            {/* Highlights pill */}
-            <div className="pt-2 flex flex-wrap items-center gap-3 text-xs text-zinc-600">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-xs rounded-lg border border-black/5 shadow-xs">
-                <Clock className="w-3.5 h-3.5 text-purple-600" />
-                <span>Pre-orders & Daily Fresh Bakes</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-xs rounded-lg border border-black/5 shadow-xs">
-                <Truck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Free delivery on ₹1,000+ orders</span>
-              </span>
+              {/* Highlights pill */}
+              <div className="pt-2 flex flex-wrap items-center gap-3 text-xs text-zinc-600">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-xs rounded-lg border border-black/5 shadow-xs">
+                  <Clock className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Pre-orders & Daily Fresh Bakes</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-xs rounded-lg border border-black/5 shadow-xs">
+                  <Truck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Free delivery on ₹1,000+ orders</span>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* 21st.dev INSTALLED WIDGETS & SECTIONS */}
+      {store.installed_components && store.installed_components.length > 0 && (
+        <Dynamic21stRenderer
+          heroId="none"
+          installedComponents={store.installed_components}
+          store={store}
+          products={products}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+          isPreview={isPreview}
+        />
+      )}
 
       {/* 4. FEATURED HIGHLIGHTS */}
       {featuredProducts.length > 0 && selectedCategory === "all" && !searchQuery && (
