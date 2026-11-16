@@ -26,6 +26,8 @@ import {
   Image as ImageIcon,
   ExternalLink,
   XCircle,
+  QrCode,
+  Smartphone,
 } from "lucide-react";
 import { useDashboard } from "@/lib/DashboardContext";
 import {
@@ -36,7 +38,13 @@ import {
   SubscriptionUpgradeRequest,
   getPlanConfig,
 } from "@/lib/plans";
-import { PAYMENT_CONFIG, isAuthorizedAdmin } from "@/lib/paymentConfig";
+import {
+  PAYMENT_CONFIG,
+  isAuthorizedAdmin,
+  getUpiPaymentUri,
+  getUpiQrCodeUrl,
+  getFallbackUpiQrCodeUrl,
+} from "@/lib/paymentConfig";
 import { formatINR, copyToClipboard } from "@/lib/utils";
 
 export default function BillingPage() {
@@ -561,9 +569,17 @@ export default function BillingPage() {
                       </span>
                       <span className="text-xs font-semibold text-charcoal-400">/month</span>
                     </div>
-                    <span className="text-[11px] text-stone-400">
+                    <span className="text-[11px] text-stone-400 block">
                       Verified payment via UPI / Bank Transfer
                     </span>
+                    {p.priceMonthly > 0 && (
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-[10px] font-bold text-purple-700 border border-purple-100">
+                          <Zap className="w-2.5 h-2.5 fill-purple-600 text-purple-600" />
+                          1-Click UPI &amp; Dynamic QR
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Feature Checklist */}
@@ -996,83 +1012,168 @@ export default function BillingPage() {
                   </span>
                 </div>
 
-                {/* Step 1: Configurable Payment Instructions & Accounts */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-400">
-                    Step 1: Make Payment Using Configured Methods
-                  </h4>
+                {/* Step 1: Pay via Dynamic UPI QR Code or 1-Click Button */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-400">
+                      Step 1: Make Payment (UPI QR or 1-Click)
+                    </h4>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
+                      Amount Pre-filled
+                    </span>
+                  </div>
 
-                  {/* Payment Accounts Box */}
-                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-3 text-xs">
-                    {/* UPI Details */}
-                    <div className="flex items-center justify-between pb-3 border-b border-stone-200/60">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold text-charcoal-400">
-                          Primary Method: UPI VPA
-                        </span>
-                        <div className="font-mono font-bold text-charcoal-900 text-sm mt-0.5">
-                          {PAYMENT_CONFIG.upiId}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyText(PAYMENT_CONFIG.upiId, "upi")}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-charcoal-700 font-bold hover:bg-stone-100 text-[11px] transition-colors"
+                  {/* Dynamic UPI Card */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-stone-50 to-purple-50/20 border border-purple-200/90 space-y-4">
+                    {/* 1-Click UPI Payment Button */}
+                    <div>
+                      <a
+                        href={getUpiPaymentUri(targetPlanToChange.priceMonthly, targetPlanToChange.name)}
+                        className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md shadow-purple-500/20 active:scale-[0.99] transition-all cursor-pointer"
                       >
-                        {copiedKey === "upi" ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                        <span>{copiedKey === "upi" ? "Copied" : "Copy UPI"}</span>
-                      </button>
+                        <Zap className="w-4 h-4 fill-amber-300 text-amber-300 animate-pulse" />
+                        <span>Pay ₹{targetPlanToChange.priceMonthly} in 1-Click via UPI App</span>
+                        <ExternalLink className="w-4 h-4 text-purple-200" />
+                      </a>
+                      <p className="text-[11px] text-charcoal-500 text-center mt-1.5 flex items-center justify-center gap-1">
+                        <Smartphone className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                        <span>
+                          On mobile, opens <strong>Google Pay</strong>, <strong>PhonePe</strong>, or <strong>Paytm</strong> with ₹{targetPlanToChange.priceMonthly} pre-filled.
+                        </span>
+                      </p>
                     </div>
 
-                    {/* Bank Details */}
-                    <div className="space-y-1.5 pt-1 text-charcoal-700">
-                      <div className="text-[10px] uppercase font-bold text-charcoal-400">
-                        Alternative Method: Direct Bank Transfer (NEFT/IMPS)
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px]">
-                        <div>
-                          <span className="text-charcoal-400">Account Name:</span>{" "}
-                          <span className="font-semibold text-charcoal-900">
-                            {PAYMENT_CONFIG.bankDetails.accountName}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-charcoal-400">Bank:</span>{" "}
-                          <span className="font-semibold text-charcoal-900">
-                            {PAYMENT_CONFIG.bankDetails.bankName}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-charcoal-400">Account #:</span>{" "}
-                          <span className="font-mono font-bold text-charcoal-900">
-                            {PAYMENT_CONFIG.bankDetails.accountNumber}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-charcoal-400">IFSC Code:</span>{" "}
-                          <span className="font-mono font-bold text-charcoal-900">
-                            {PAYMENT_CONFIG.bankDetails.ifscCode}
-                          </span>
+                    {/* Divider: OR SCAN QR CODE */}
+                    <div className="relative flex items-center justify-center">
+                      <div className="border-t border-stone-200 w-full" />
+                      <span className="bg-stone-50 px-3 text-[10px] font-bold uppercase tracking-wider text-charcoal-400 shrink-0">
+                        Or Scan Plan QR Code
+                      </span>
+                      <div className="border-t border-stone-200 w-full" />
+                    </div>
+
+                    {/* Dynamic QR Code Box */}
+                    <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-xs flex flex-col items-center text-center">
+                      <div className="relative inline-block bg-white p-2.5 rounded-xl border border-stone-200 shadow-2xs">
+                        <img
+                          src={getUpiQrCodeUrl(targetPlanToChange.priceMonthly, targetPlanToChange.name, 240)}
+                          onError={(e) => {
+                            e.currentTarget.src = getFallbackUpiQrCodeUrl(
+                              targetPlanToChange.priceMonthly,
+                              targetPlanToChange.name,
+                              240
+                            );
+                          }}
+                          alt={`UPI QR Code for ₹${targetPlanToChange.priceMonthly} (${targetPlanToChange.name} Plan)`}
+                          className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-lg"
+                        />
+                        <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-charcoal-900 text-white text-[10px] font-bold tracking-wide shadow-sm whitespace-nowrap flex items-center gap-1">
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span>₹{targetPlanToChange.priceMonthly} Pre-configured</span>
                         </div>
                       </div>
+
+                      <p className="text-xs font-bold text-charcoal-900 mt-4">
+                        Scan with Google Pay, PhonePe, Paytm, BHIM or any UPI App
+                      </p>
+                      <p className="text-[11px] text-charcoal-500 mt-0.5">
+                        Payee: <strong className="text-charcoal-800">{PAYMENT_CONFIG.bankDetails.accountName}</strong>
+                      </p>
+
+                      {/* Supported App Badges */}
+                      <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2.5">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 text-charcoal-700 border border-stone-200">
+                          Google Pay
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                          PhonePe
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">
+                          Paytm
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          BHIM UPI
+                        </span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
+                          CRED
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Manual Details & Bank Accordion */}
+                    <div className="pt-2 border-t border-stone-200/70 space-y-2.5">
+                      {/* Copy UPI ID */}
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-stone-200">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-charcoal-400 block">
+                            SellNest UPI ID (VPA)
+                          </span>
+                          <span className="font-mono font-bold text-charcoal-900 text-xs">
+                            {PAYMENT_CONFIG.upiId}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyText(PAYMENT_CONFIG.upiId, "upi")}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-50 hover:bg-stone-100 border border-stone-200 text-charcoal-700 font-bold text-xs transition-colors shadow-2xs"
+                        >
+                          {copiedKey === "upi" ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                          <span>{copiedKey === "upi" ? "Copied" : "Copy UPI ID"}</span>
+                        </button>
+                      </div>
+
+                      {/* Direct Bank Transfer Details Accordion */}
+                      <details className="group text-xs">
+                        <summary className="cursor-pointer text-purple-700 font-semibold hover:text-purple-900 select-none py-1 flex items-center justify-between">
+                          <span>Pay via Direct Bank Transfer (NEFT / IMPS)?</span>
+                          <span className="text-[10px] text-charcoal-400 group-open:rotate-180 transition-transform">
+                            &#9660;
+                          </span>
+                        </summary>
+                        <div className="mt-2 p-3 rounded-xl bg-white border border-stone-200 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-charcoal-700">
+                          <div>
+                            <span className="text-charcoal-400">Account Name:</span>{" "}
+                            <span className="font-semibold text-charcoal-900 block">
+                              {PAYMENT_CONFIG.bankDetails.accountName}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-charcoal-400">Bank:</span>{" "}
+                            <span className="font-semibold text-charcoal-900 block">
+                              {PAYMENT_CONFIG.bankDetails.bankName}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-charcoal-400">Account #:</span>{" "}
+                            <span className="font-mono font-bold text-charcoal-900 block">
+                              {PAYMENT_CONFIG.bankDetails.accountNumber}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-charcoal-400">IFSC Code:</span>{" "}
+                            <span className="font-mono font-bold text-charcoal-900 block">
+                              {PAYMENT_CONFIG.bankDetails.ifscCode}
+                            </span>
+                          </div>
+                        </div>
+                      </details>
                     </div>
                   </div>
 
                   {/* Bullet Instructions */}
-                  <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-200/80 text-[11px] text-amber-900 space-y-1">
-                    <p className="font-bold">Instructions for fast verification:</p>
-                    <ul className="list-disc pl-4 space-y-0.5 opacity-90">
-                      <li>Pay exact ₹{targetPlanToChange.priceMonthly} via any UPI app or Net Banking.</li>
-                      <li>Copy the 12-digit UTR / Transaction Reference from your payment screen.</li>
-                      <li>
-                        Plans are activated within {PAYMENT_CONFIG.processingPromiseHours} hours after
-                        admin verification.
-                      </li>
-                    </ul>
+                  <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Next: Submit your 12-digit UTR below</p>
+                      <p className="opacity-90">
+                        After transferring ₹{targetPlanToChange.priceMonthly}, copy the 12-digit UTR / Reference number from your payment app screen and paste it into Step 2 below. Plans are activated within {PAYMENT_CONFIG.processingPromiseHours} hours.
+                      </p>
+                    </div>
                   </div>
                 </div>
 

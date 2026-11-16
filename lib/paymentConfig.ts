@@ -33,7 +33,10 @@ export const PAYMENT_CONFIG: PaymentConfig = {
 
   // Configurable Bank Details
   bankDetails: {
-    accountName: process.env.PAYMENT_ACCOUNT_NAME || "SellNest Platforms Pvt Ltd",
+    accountName:
+      process.env.NEXT_PUBLIC_PAYMENT_ACCOUNT_NAME ||
+      process.env.PAYMENT_ACCOUNT_NAME ||
+      "SellNest Platforms Pvt Ltd",
     accountNumber: process.env.PAYMENT_ACCOUNT_NUMBER || "50200084920194",
     ifscCode: process.env.PAYMENT_IFSC || "HDFC0001234",
     bankName: process.env.PAYMENT_BANK_NAME || "HDFC Bank",
@@ -72,4 +75,35 @@ export function isAuthorizedAdmin(email?: string | null): boolean {
   const clean = email.toLowerCase().trim();
   return PAYMENT_CONFIG.adminEmails.some((adminEmail) => adminEmail.toLowerCase().trim() === clean);
 }
+
+/**
+ * Generate standard UPI payment deep-link URI (NPCI standard).
+ * Format: upi://pay?pa=<vpa>&pn=<name>&am=<amount>&cu=INR&tn=<note>
+ */
+export function getUpiPaymentUri(amount: number, planName: string, customNote?: string): string {
+  const pa = PAYMENT_CONFIG.upiId || "sellnest@upi";
+  const pn = PAYMENT_CONFIG.bankDetails.accountName || "SellNest Platforms";
+  const tn = customNote || `SellNest ${planName} Plan`;
+  const formattedAmount = Number.isInteger(amount) ? amount.toString() : amount.toFixed(2);
+
+  return `upi://pay?pa=${pa}&pn=${encodeURIComponent(pn)}&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(tn)}`;
+}
+
+/**
+ * High-resolution dynamic QR code image URL for a specific plan amount and name.
+ * Encodes the standard UPI URI so any UPI scanner reads payee, exact amount, and note.
+ */
+export function getUpiQrCodeUrl(amount: number, planName: string, size = 260): string {
+  const uri = getUpiPaymentUri(amount, planName);
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=10&data=${encodeURIComponent(uri)}`;
+}
+
+/**
+ * Fallback dynamic QR code image URL (QuickChart) in case primary CDN is blocked
+ */
+export function getFallbackUpiQrCodeUrl(amount: number, planName: string, size = 260): string {
+  const uri = getUpiPaymentUri(amount, planName);
+  return `https://quickchart.io/qr?size=${size}&margin=2&text=${encodeURIComponent(uri)}`;
+}
+
 
